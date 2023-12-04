@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { JsonView, allExpanded, darkStyles, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import ATJ from './ATJ';
+import MediaSession from './Mediasession';
 
 let Up = ({display, streamdata}) => {
   const [prev, setprev] = useState(null)
@@ -28,6 +29,7 @@ let Up = ({display, streamdata}) => {
                   }
                 })
               }
+              MediaSession()
             }} controls muted={val.id === localStorage.getItem('id')} autoPlay playsInline className={`id_${val.id} ${val.hasOwnProperty('display') ? val.display ? `` : `vpreinad` : ''} w-full h-full`}></video>
           </div>
           <div className="modalsnaidviews flex items-center justify-between mt-2 gap-2 p-1 rounded-md brd bg-[var(--basebg)]">

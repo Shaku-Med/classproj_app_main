@@ -35,7 +35,7 @@ let Down = () => {
             // 
             let video = document.createElement('video')
             video.srcObject = r
-            
+
             video.onloadedmetadata = () => { 
                 let vd = document.querySelector(`.id_${id}`)
                 if(vd){ 
@@ -138,9 +138,9 @@ let Down = () => {
 
     };
 
-    useLayoutEffect(() => { 
-        try { 
-            setPEER(null, true, null, null)
+
+    let NPP = () => { 
+        setPEER(null, true, null, null)
             // 
 
             peerRef.current.on('call', (call) => { 
@@ -172,6 +172,32 @@ let Down = () => {
                     }
                 }
             });
+    }
+
+    let heartBeat = () => { 
+        setInterval(() => { 
+            if(isstream){ 
+                socket.emit(`HeartBeat`, `Bombpp`)
+                if(socket.connected === false){ 
+                    Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).addstream(true)
+                    socket.connect()
+                }
+            }
+            else { 
+                socket.emit(`HeartBeat`, `Bombpp`)
+                if(socket.connected === false){
+                    console.log("YO") 
+                    NPP()
+                    socket.connect()
+                } 
+            }
+        }, 3 * 2000)
+    }
+
+    useLayoutEffect(() => { 
+        try { 
+            NPP()
+            heartBeat()
         }
         catch {
 
@@ -188,6 +214,7 @@ let Down = () => {
       toast.info(`Something's wrong. \t \n Please check your browser's access to your camera & audio setting`)
     }
   }, [])
+
 
     return (
         <div className=' videoviewpartsetup w-full h-full overflow-hidden flex items-center justify-between flex-col'>
