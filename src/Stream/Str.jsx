@@ -1,5 +1,6 @@
 import React from 'react'
 import { toast } from 'react-toastify'
+import { isMobile } from 'react-device-detect'
 
 let Stream = () => {
     // 
@@ -22,11 +23,13 @@ let Stream = () => {
                     })
                 }
                 const constraints = {
-                    audio: audiomuted === true ? !videomuted ? false : true : {
+                    audio: audiomuted === true ? !videomuted ? false : true : isMobile ? true : {
                         deviceId: audioSource ? { exact: audioSource } : undefined,
                         mute: audiomuted
                     },
-                    video: videomuted === true ? !audiomuted ? false : true : {
+                    video: videomuted === true ? !audiomuted ? false : true : isMobile ?  facingMode !== undefined && facingMode !== 'user' ? {
+                        facingMode: { exact: facingMode },
+                    } : true : {
                         deviceId: videoSource ? { exact: videoSource } : undefined,
                         facingMode: { exact: facingMode },
                         mute: videomuted

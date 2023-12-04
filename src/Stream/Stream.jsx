@@ -1,4 +1,5 @@
 import React from 'react'
+import { isMobile } from 'react-device-detect';
 
 let Sad = (source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack) => {
     try {
@@ -41,9 +42,9 @@ let Sad = (source, setsource, isstream, setisstream, display, setdisplay, camera
                             toast.error(`Unable to rearrange the current to present.`)
                         }
                     });
-                    if (active.length > 0) {
-                        let au = active[0].type.includes('audio') ? active[0].id.deviceId : active[1].id.deviceId
-                        let vu = active[1].type.includes('video') ? active[1].id.deviceId : active[0].id.deviceI
+                    if (active.length > 0 || isMobile === true) {
+                        let au = isMobile ? null : active[0].type.includes('audio') ? active[0].id.deviceId : active[1].id.deviceId
+                        let vu = isMobile ? null : active[1].type.includes('video') ? active[1].id.deviceId : active[0].id.deviceI
                         // 
                         Stream().requestStream(au, vu, facingMode !== undefined && facingMode !== null ? facingMode : 'user', audio !== undefined ? audio : false, video !== undefined ? video : false, stop, stream, setisstream, screen === undefined ? false : screen, setdisplay).then(r => {
                             // 

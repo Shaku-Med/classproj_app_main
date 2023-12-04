@@ -35,17 +35,43 @@ body {
 }
 
 video {
-    pointer-events: none;
+    /* pointer-events: none; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-video::-webkit-media-controls {
+/* video::-webkit-media-controls {
     display: none;
-}
+} */
 
 img {
     pointer-events: none;
 }
 
-.vpreinad {
+/* .vpreinad {
     transform: rotateY(-180deg);
+} */
+
+.stdadinad { 
+   display: flex;
+   flex-wrap: wrap;
+   gap: 10px;
+}
+
+.dianakestream { 
+    flex: 1 1 20rem;
+    height: 400px;
+    overflow: auto;
+}
+
+@media screen and (max-width: 800px) {
+    .dianakestream { 
+        flex: 1 1 15rem;
+    }
+}
+@media screen and (max-width: 600px) {
+    .dianakestream { 
+        flex: 1 1 10rem;
+    }
 }

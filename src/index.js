@@ -13,12 +13,14 @@ if (!localStorage.getItem('id')) {
 }
 
 
-let socket = io(`http://localhost:3001`, {
+let socket = io(`https://literate-succotash-p596prgpjxgf6x9q-3001.app.github.dev`, {
   reconnection: true,
   reconnectionAttempts: 4,
   reconnectionDelay: 1000,
   debug: true
 });
+
+
 // // 
 // socket.on('connect', () => { 
 //     toast.info(`Connected to Server`)

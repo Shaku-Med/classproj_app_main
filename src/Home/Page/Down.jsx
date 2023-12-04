@@ -11,7 +11,7 @@ import * as Device from 'react-device-detect'
 
 let Down = () => {
 
-    const { peerRef, socket} = useContext(Conn);
+  const { peerRef, socket} = useContext(Conn);
 
   const [source, setsource] = useState([])
   const [isstream, setisstream] = useState(false)
@@ -20,48 +20,71 @@ let Down = () => {
   const [camera, setcamera] = useState(null)
   const [mic, setmic] = useState(null)
   const [facing, setfacing] = useState('user')
-    const [stream, setstream] = useState(null)
+  const [stream, setstream] = useState(null)
 
-    const [joined, setjoined] = useState(false)
+  const [joined, setjoined] = useState(false)
+
+    // Streams USERS & ME
+    const [streamdata, setstreamdata] = useState([]);
+    const [rl, setrl] = useState(0)
 
     let addST = (r, id, data, display) => {
         // 
         let streamcontainer = document.querySelector('.streamcontainer')
         if (streamcontainer !== null) {
             // 
-            let div = document.createElement('div')
             let video = document.createElement('video')
-            // 
-            video.setAttribute(`class`, `${display ? '' : 'vpreinad'} transition-all bg-[var(--mainBg)] w-full h-full swap-rotate`)
-            // 
-            div.setAttribute(`class`, `videogridflexsiznied id_${id}   overflow-hidden rounded-lg backdrop-blur-sm shadow-md brd h-full`)
-            // 
-            video.autoplay = true
-            // 
             video.srcObject = r
-            // 
-            // 
-            let getid = streamcontainer.querySelector(`.id_${id}`)
-            // 
-            if (getid !== null) {
-                streamcontainer.removeChild(getid)
-
-                video.onloadedmetadata = () => {
-                    div.appendChild(video)
-                    streamcontainer.appendChild(div)
+            
+            video.onloadedmetadata = () => { 
+                let vd = document.querySelector(`.id_${id}`)
+                if(vd){ 
+                    vd.srcObject = r
                 }
             }
-            else {
-                video.onloadedmetadata = () => {
-                    div.appendChild(video)
-                    streamcontainer.appendChild(div)
-                }
-            }
-            // 
         }
     };
 
+    let setPEER = (addST, type, r, dif) => { 
+        // Perform Connection
+        peerRef.current = new Peer(`${localStorage.getItem('id')}`, {
+            host: `literate-succotash-p596prgpjxgf6x9q-3002.app.github.dev`,
+            path: `/stream`,
+        })
+
+        // Connect Check 
+        peerRef.current.on('open', (id) => {
+            if(type !== true){ 
+                socket.emit('join', dif(id))
+            }
+            else { 
+                socket.emit(`view`, {id: `${localStorage.getItem('id')}`})
+            }
+        })
+
+        peerRef.current.on('call', (call) => { 
+            call.answer(r)
+            call.on('stream', (vidstream) => { 
+               if(type !== true){ 
+                addST(vidstream, call.peer, null, display)
+               }
+               else { 
+                // console.log(vidstream)
+               }
+            })
+        })
+    }
+
     let CallBack = (r) => {
+        if(streamdata.length < 1){ 
+            setstreamdata([
+                { 
+                    id: `${localStorage.getItem('id')}`,
+                    state: 'offline'
+                }
+            ])
+        }
+        // 
         addST(r, `${localStorage.getItem('id')}`, [], display)
 
         let dif = (id) => {
@@ -75,32 +98,20 @@ let Down = () => {
                 outerHeight: window.outerHeight,
                 outerWidth: window.outerWidth,
                 time: new Date().getTime(),
+                display: display,
             }
         };
 
         if (joined === true) { 
             socket.emit('join', dif(`${localStorage.getItem('id')}`))
         }
+
+        if(peerRef.current !== null){ 
+            peerRef.current.destroy()
+        }
         
-        // Perform Connection
-        peerRef.current = new Peer(`${localStorage.getItem('id')}`, {
-            host: `localhost`,
-            port: 3002,
-            path: `/stream`,
-        })
-
-        // Connect Check 
-        peerRef.current.on('open', (id) => {
-            socket.emit('join', dif(id))
-        })
-
-        peerRef.current.on('call', (call) => { 
-            call.answer(r)
-            call.on('stream', (vidstream) => { 
-                 addST(vidstream, call.peer, null, display)
-            })
-        })
-
+        setPEER(addST, null, r, dif)
+    
         //
 
         socket.on('joined', (data) => {
@@ -109,7 +120,9 @@ let Down = () => {
             if (data.length > 0){ 
                 let filter = data.filter(v => v.id !== `${localStorage.getItem('id')}`)
                 if (filter !== undefined && filter.length > 0) { 
-                    data.map((v) => { 
+                    setstreamdata(data)
+                    // 
+                    filter.map((v) => { 
                         let call = peerRef.current.call(`${v.id}`, r)
                         if (call !== undefined) { 
                             call.on('stream', (vidstream) => { 
@@ -125,8 +138,48 @@ let Down = () => {
 
     };
 
+    useLayoutEffect(() => { 
+        try { 
+            setPEER(null, true, null, null)
+            // 
+
+            peerRef.current.on('call', (call) => { 
+                call.answer(null)
+                call.on('stream', (vidstream) => { 
+                    addST(vidstream, call.peer, null, display)
+                })
+            })
+
+            socket.on('joined', data => { 
+                if (data.length > 0){ 
+                    let filter = data.filter(v => v.id !== `${localStorage.getItem('id')}`)
+                    if (filter !== undefined && filter.length > 0) { 
+                        setstreamdata(data)
+                        // 
+                        filter.map((v) => { 
+                            let call = peerRef.current.call(`${v.id}`, new MediaStream(), {
+                                constraints: {
+                                    offerToReceiveAudio: true,
+                                    offerToReceiveVideo: true,
+                                }
+                            })
+                            if (call !== undefined) { 
+                                call.on('stream', (vidstream) => { 
+                                    addST(vidstream, call.peer, v, display)
+                                })
+                            }
+                        })
+                    }
+                }
+            });
+        }
+        catch {
+
+        }
+    }, [])
+
   useLayoutEffect(() => { 
-    try { 
+    try {         
       if (!isMobile) { 
         Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).getSrc()
       }
@@ -138,8 +191,8 @@ let Down = () => {
 
     return (
         <div className=' videoviewpartsetup w-full h-full overflow-hidden flex items-center justify-between flex-col'>
-            <Up display={display} />
-            <div className="streamercontrolsaidnfoas w-full p-2 flex items-center justify-center">
+            <Up streamdata={streamdata} display={display} />
+            <div className="streamercontrolsaidnfoas pb-4 w-full p-4 flex items-center justify-center">
                 <div className="controlscenterilizers max-w-[1000px] join gap-1 flex items-center justify-evenly p-2 bg-[var(--border)] rounded-md shadow-md backdrop-blur-md brd w-full">
                     {
                         isMobile ? '' :
@@ -207,6 +260,6 @@ let Down = () => {
             </div>
         </div>
     );
-}
+};
 
 export default Down
