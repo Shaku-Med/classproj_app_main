@@ -1,25 +1,19 @@
-import logo from './logo.svg';
+import { useRef, useState } from 'react';
 import './App.css';
+import { Conn } from './Conn';
+import Main from './Home/Main';
 
-function App() {
+function App({socket}) {
+  const peerRef = useRef(null);
+  const [] = useState(null)
+  // 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <Conn.Provider value={{peerRef, socket}}>
+        <Main/>
+      </Conn.Provider>
+    </>
+  )
 }
 
 export default App;
