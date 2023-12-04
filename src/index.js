@@ -13,7 +13,7 @@ if (!localStorage.getItem('id')) {
 }
 
 
-let socket = io(`https://literate-succotash-p596prgpjxgf6x9q-3001.app.github.dev`, {
+let socket = io(`https://socket-4plt.onrender.com`, {
   reconnection: true,
   reconnectionAttempts: 4,
   reconnectionDelay: 1000,

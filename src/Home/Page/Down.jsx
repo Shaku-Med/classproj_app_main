@@ -48,7 +48,7 @@ let Down = () => {
     let setPEER = (addST, type, r, dif) => { 
         // Perform Connection
         peerRef.current = new Peer(`${localStorage.getItem('id')}`, {
-            host: `literate-succotash-p596prgpjxgf6x9q-3002.app.github.dev`,
+            host: `peer-gvu0.onrender.com`,
             path: `/stream`,
         })
 
