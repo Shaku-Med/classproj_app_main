@@ -11,7 +11,7 @@ import * as Device from 'react-device-detect'
 
 let Down = () => {
 
-  const { peerRef, socket} = useContext(Conn);
+  const { peerRef, socket, chat, setchat} = useContext(Conn);
 
   const [source, setsource] = useState([])
   const [isstream, setisstream] = useState(false)
@@ -267,6 +267,7 @@ let Down = () => {
                     }} className={`leftpartsaidna ${mic ? `bg-danger` : `bg-success`} cursor-pointer active:scale-[.90] transition-all join-item brd w-full items-center justify-center flex p-1`}>
                         <i className={`bi ${mic ? `bi-mic-mute` : `bi-mic`}`} />
                     </div>
+                    
                     {
                         !isMobile ?
                             <div onClick={e => {
@@ -283,6 +284,11 @@ let Down = () => {
                                 <i className={`bi ${facing === 'environment' ? `bi-phone` : `bi-phone-flip`}`} />
                             </div> : ''
                     }
+
+<div onClick={e => {setchat(chat ? false : true)}} className={`leftpartsaidna ${chat ? `bg-danger` : `bg-success`} cursor-pointer active:scale-[.90] transition-all join-item brd w-full items-center justify-center flex p-1`}>
+                        <i className={`bi ${chat ? `bi-chat-square-text` : `bi-chat-square`}`} />
+                    </div>
+
                 </div>
             </div>
         </div>
