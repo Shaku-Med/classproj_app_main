@@ -12,6 +12,7 @@ if (!localStorage.getItem('id')) {
   localStorage.setItem(`id`, `${uuid().split('-').join('').toUpperCase()}`)
 }
 
+// https://socket-4plt.onrender.com
 
 let socket = io(`https://socket-4plt.onrender.com`, {
   reconnection: true,

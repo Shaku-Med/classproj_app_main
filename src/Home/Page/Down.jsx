@@ -11,7 +11,7 @@ import * as Device from 'react-device-detect'
 
 let Down = () => {
 
-  const { peerRef, socket, chat, setchat} = useContext(Conn);
+  const { peerRef, socket, chat, setchat, streamdata, setstreamdata} = useContext(Conn);
 
   const [source, setsource] = useState([])
   const [isstream, setisstream] = useState(false)
@@ -25,7 +25,6 @@ let Down = () => {
   const [joined, setjoined] = useState(false)
 
     // Streams USERS & ME
-    const [streamdata, setstreamdata] = useState([]);
     const [rl, setrl] = useState(0)
 
     let addST = (r, id, data, display) => {
@@ -186,7 +185,6 @@ let Down = () => {
             else { 
                 socket.emit(`HeartBeat`, `Bombpp`)
                 if(socket.connected === false){
-                    console.log("YO") 
                     NPP()
                     socket.connect()
                 } 

@@ -41,6 +41,7 @@ video {
     justify-content: center;
 }
 
+
 /* video::-webkit-media-controls {
     display: none;
 } */
@@ -49,29 +50,126 @@ img {
     pointer-events: none;
 }
 
+
 /* .vpreinad {
     transform: rotateY(-180deg);
 } */
 
-.stdadinad { 
-   display: flex;
-   flex-wrap: wrap;
-   gap: 10px;
+.stdadinad {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.dianakestream { 
+.dianakestream {
     flex: 1 1 20rem;
     height: 400px;
     overflow: auto;
 }
 
 @media screen and (max-width: 800px) {
-    .dianakestream { 
+    .dianakestream {
         flex: 1 1 15rem;
     }
 }
+
 @media screen and (max-width: 600px) {
-    .dianakestream { 
+    .dianakestream {
         flex: 1 1 10rem;
     }
+}
+
+div::-webkit-scrollbar {
+    display: none;
+    transition: .3s ease-in-out;
+}
+
+div:hover::-webkit-scrollbar {
+    background: var(--basebg);
+    width: 5px;
+    height: 5px;
+    display: block;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--border);
+}
+
+ul::-webkit-scrollbar {
+    display: none;
+    transition: .3s ease-in-out;
+}
+
+ul:hover::-webkit-scrollbar {
+    background: var(--basebg);
+    width: 5px;
+    height: 5px;
+    display: block;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--border);
+}
+
+.bigx {
+    opacity: 0;
+    transition: 100ms ease-in-out all;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.fileconteinrasd:hover .bigx {
+    pointer-events: all;
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdownitm {
+    color: var(--mainCl);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.dropdownitm:hover {
+    background: var(--border);
+    color: var(--mainCl);
+}
+
+.flexaidna {
+    flex: 1 1 20rem;
+}
+
+.Main {
+    position: relative;
+}
+
+.Main::before {
+    content: '';
+    width: .5px;
+    height: 100%;
+    background: var(--basebg);
+    position: absolute;
+    top: 0px;
+    left: 5px;
+}
+
+.brd2 {
+    border-top: .5px solid var(--border);
+    border-bottom: .5px solid var(--border);
 }

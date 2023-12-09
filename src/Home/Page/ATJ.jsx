@@ -1,8 +1,16 @@
 import { JsonView, allExpanded, darkStyles, defaultStyles } from 'react-json-view-lite';
+import PVu from '../../Chatbox/Container/Chatb/PVu';
+import { useContext, useState } from 'react';
+import { Conn } from '../../Conn';
 
-let ATJ = ({val, setprev}) => { 
+let ATJ = ({ val, setprev, isprev }) => {   
     return ( 
-        <div className="aidnkikeaidfviewsnow flex items-center justify-between flex-col fixed top-0 left-0 w-full h-full z-[10000000000000] bg-[var(--basebg)] backdrop-blur-md">
+      <>
+        {isprev ? 
+          <>
+            <PVu/>
+          </> : 
+          <div className="aidnkikeaidfviewsnow flex items-center justify-between flex-col fixed top-0 left-0 w-full h-full z-[10000000000000] bg-[var(--basebg)] backdrop-blur-md">
           <div className="modalsnaidviews w-full flex items-center justify-between gap-2 p-1 brd bg-[var(--basebg)]">
             <div className="ipaddresshere">
               Attack Info
@@ -15,6 +23,8 @@ let ATJ = ({val, setprev}) => {
            <JsonView data={val} shouldExpandNode={allExpanded} style={defaultStyles} />
            </div>
           </div>
+        }
+      </>
     )
 }
 
