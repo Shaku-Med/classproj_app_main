@@ -31,7 +31,7 @@ function Chatb({ val, isrepl}) {
                             Reply
                         </div>
                         {
-                            val.userid === localStorage.getItem('id') ?
+                            val.sendid === localStorage.getItem('id') ?
                                 <>
                                     <div onClick={e => {
                                         setaction({
