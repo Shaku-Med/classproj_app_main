@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import './App.css';
 import { Conn } from './Conn';
 import Main from './Home/Main';
@@ -179,6 +179,17 @@ function App({ socket }) {
       }
     }, 10)
   }, [])
+
+  useEffect(() => {
+    try {
+      if (ref && ref.current !== null) {
+        if (action.type !== null) {
+          ref.current.focus()
+        }
+      }
+    }
+    catch { }
+  }, [action]);
   
   return (
     <>
