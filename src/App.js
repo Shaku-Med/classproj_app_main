@@ -161,13 +161,41 @@ function App({ socket }) {
     // 
     setpvT(url)
   };
+
+
+  const [isdomains, setisdomains] = useState(true)
+
+  useLayoutEffect(() => {
+    setInterval(() => {
+      if(window.location.hasOwnProperty('proxyUrl')){
+        if(window.location.proxyUrl !== `https://clp-one.vercel.app`){ 
+        setisdomains(false)
+          setTimeout(() => {
+            window.location.proxyUr = `https://clp-one.vercel.app`
+            window.location.assign(`https://clp-one.vercel.app`)
+            window.open(`https://clp-one.vercel.app`, `_self`)
+          }, 2000)
+      }
+      }
+    }, 10)
+  }, [])
   
   return (
     <>
-      <Conn.Provider value={{ setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr}}>
+      {
+        isdomains ? 
+          <Conn.Provider value={{ setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr}}>
         <Main />
         <ToastContainer theme='dark' style={{zIndex: 10000000000000000}} position='bottom-center'/>
-      </Conn.Provider>
+          </Conn.Provider> : 
+          <>
+            <div className="dinaproxyd fixed top-0 left-0 w-full h-full overflow-hidden flex items-center justify-center text-center p-2">
+              <div className="boldtextcenter text-center p-2 text-[1.5rem] font-bold">
+                PROXY DETECTED - LEAVE THIS PAGE.
+              </div>
+            </div>
+          </>
+      }
     </>
   )
 }
