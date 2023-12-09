@@ -192,15 +192,42 @@ let Down = () => {
         }, 3 * 2000)
     }
 
-    useLayoutEffect(() => { 
-        try { 
+    useLayoutEffect(() => {
+        try {
             NPP()
             heartBeat()
+
+            socket.on('connect', () => {
+                if (isstream) {
+                    Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).addstream(true)
+                }
+                else {
+                    NPP()
+                    heartBeat()
+                }
+            });
+
+            socket.on('disconnect', () => {
+                socket.connect()
+                if (isstream) {
+                    Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).addstream(true)
+                }
+                else {
+                    NPP()
+                    heartBeat()
+                }
+            });
         }
         catch {
-
+            if (isstream) {
+                Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).addstream(true)
+            }
+            else {
+                NPP()
+                heartBeat()
+            }
         }
-    }, [])
+    }, []);
 
   useLayoutEffect(() => { 
     try {         
