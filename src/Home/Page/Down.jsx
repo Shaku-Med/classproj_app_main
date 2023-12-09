@@ -45,9 +45,9 @@ let Down = () => {
     };
 
     let setPEER = (addST, type, r, dif) => { 
-        // Perform Connection (peer-gvu0.onrender.com)
+        // Perform Connection
         peerRef.current = new Peer(`${localStorage.getItem('id')}`, {
-            host: `peer.kissass.repl.co`,
+            host: `peer-gvu0.onrender.com`,
             path: `/stream`,
         })
 
