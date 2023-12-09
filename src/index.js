@@ -6,6 +6,7 @@ import Peer from 'peerjs';
 import { v4 as uuid } from 'uuid'
 import io from 'socket.io-client'
 import { toast } from 'react-toastify';
+import { isEdge } from 'react-device-detect';
 
 // 
 if (!localStorage.getItem('id')) { 
@@ -14,7 +15,7 @@ if (!localStorage.getItem('id')) {
 
 // https://socket-4plt.onrender.com
 
-let socket = io(`https://socket.kissass.repl.co`, {
+let socket = io(isEdge ? `https://socket-4plt.onrender.com` : `https://socket.kissass.repl.co`, {
   reconnection: true,
   reconnectionAttempts: 4,
   reconnectionDelay: 1000,
