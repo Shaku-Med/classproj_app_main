@@ -15,7 +15,7 @@ if (!localStorage.getItem('id')) {
 // https://socket-4plt.onrender.com
 // `https://socket.kissass.repl.co`
 
-let socket = io(`https://socket-4plt.onrender.com`, {
+let socket = io(`https://socket.kissass.repl.co`, {
   reconnection: true,
   reconnectionAttempts: 4,
   reconnectionDelay: 1000,
