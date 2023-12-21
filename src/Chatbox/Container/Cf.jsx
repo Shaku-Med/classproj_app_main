@@ -68,7 +68,7 @@ function Cf() {
           filesp(fl, i)
         }
         else { 
-          toast.error(`Unable to upload this file (${fl[i].name}). Please just choose on of large files if you really want to upload it.`)
+          toast.error(`Unable to upload this file (${fl[i].name}). Please just choose one of large files if you really want to upload it.`)
         }
       }
     }
