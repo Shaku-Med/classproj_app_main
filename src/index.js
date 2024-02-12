@@ -17,7 +17,7 @@ if (!localStorage.getItem('id')) {
 
 let socket = io(`https://socket-4plt.onrender.com`, {
   reconnection: true,
-  reconnectionAttempts: 4,
+  reconnectionAttempts: 10000,
   reconnectionDelay: 1000,
   debug: true
 });
