@@ -35,9 +35,16 @@ let Down = () => {
             let video = document.createElement('video')
             video.srcObject = r
 
-            video.onloadedmetadata = () => { 
+            video.onerror = () => {
+                var elements = document.querySelector(`.objElement_${id}`);
+                if (elements) {
+                    elements.style.display = 'none'
+                }
+            }
+
+            video.onloadedmetadata = () => {
                 let vd = document.querySelector(`.id_${id}`)
-                if(vd){ 
+                if (vd) {
                     vd.srcObject = r
                 }
             }

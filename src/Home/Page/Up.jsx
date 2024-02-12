@@ -21,9 +21,9 @@ let Up = ({ display, streamdata }) => {
               <div key={key} className={`dianakestream objElement_${val.id} p-3 bg-[var(--border)] brd shadow-md rounded-md`}>
                 <div className="streamvideoc h-[300px] overflow-hidden">
                   <video onError={e => {
-                    var elements = document.getElementsByClassName(`objElement_${val.id}`);
-                    while (elements.length > 0) {
-                      elements[0].parentNode.removeChild(elements[0]);
+                    var elements = document.querySelector(`.objElement_${val.id}`);
+                    if (elements) {
+                      elements.style.display = 'none'
                     }
                   }} onLoadedMetadata={e => {
                     let video = document.querySelectorAll('video')
