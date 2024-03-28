@@ -180,7 +180,7 @@ let App = ({ socket }) => {
         // 
         v.file = JSON.stringify(v.file);
         v.upT = new Date().toDateString().split(/\s/).join('_');
-        let ax = await axios.post(`https://socket-4plt.onrender.com`, v, {
+        let ax = await axios.post(`hhttps://socket-9xvq.onrender.com`, v, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
@@ -290,8 +290,8 @@ let App = ({ socket }) => {
   let RC = () => {
     if (!socket.connected) {
       socket = null;
-      // https://socket-4plt.onrender.com
-      socket = io(`https://socket-4plt.onrender.com`, {
+      // hhttps://socket-9xvq.onrender.com
+      socket = io(`hhttps://socket-9xvq.onrender.com`, {
         reconnection: true,
         reconnectionAttempts: 10000,
         reconnectionDelay: 1000,
@@ -381,7 +381,7 @@ let App = ({ socket }) => {
   let LST = async (next) => {
     try {
       if (next) {
-        let ax = await axios.get(`https://socket-4plt.onrender.com/get/${uuid()}?next=${next}`, {
+        let ax = await axios.get(`hhttps://socket-9xvq.onrender.com/get/${uuid()}?next=${next}`, {
           onUploadProgress: e => {
             const { loaded, total } = e;
             const p = Math.round((loaded * 100) / total);
