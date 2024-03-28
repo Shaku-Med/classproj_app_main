@@ -14,7 +14,8 @@ if (!localStorage.getItem('id')) {
 
 // https://socket-4plt.onrender.com
 // `https://socket.kissass.repl.co`
-
+// https://socket-4plt.onrender.com
+// 
 let socket = io(`https://socket-4plt.onrender.com`, {
   reconnection: true,
   reconnectionAttempts: 10000,
@@ -33,7 +34,9 @@ let socket = io(`https://socket-4plt.onrender.com`, {
 //     toast.info(`Disconnected from Server`)
 // });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+window.addEventListener('DOMContentLoaded', () => {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(
     <App socket={socket} />
-);
+  );
+});

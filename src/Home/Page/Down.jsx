@@ -1,4 +1,4 @@
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { toast } from 'react-toastify'
 import Sad from '../../Stream/Stream'
@@ -6,16 +6,14 @@ import Stream from '../../Stream/Str'
 import Up from './Up'
 import {v4 as uuid} from 'uuid'
 import { Conn } from '../../Conn'
-import Peer from 'peerjs'
 import * as Device from 'react-device-detect'
 
 let Down = () => {
 
-  const { peerRef, socket, chat, setchat, streamdata, setstreamdata} = useContext(Conn);
+  const { dif, setPEER, display, setdisplay, addST, peerRef, socket, chat, setchat, streamdata, setstreamdata, JOIND} = useContext(Conn);
 
   const [source, setsource] = useState([])
   const [isstream, setisstream] = useState(false)
-  const [display, setdisplay] = useState(false)
   // 
   const [camera, setcamera] = useState(null)
   const [mic, setmic] = useState(null)
@@ -27,59 +25,6 @@ let Down = () => {
     // Streams USERS & ME
     const [rl, setrl] = useState(0)
 
-    let addST = (r, id, data, display) => {
-        // 
-        let streamcontainer = document.querySelector('.streamcontainer')
-        if (streamcontainer !== null) {
-            // 
-            let video = document.createElement('video')
-            video.srcObject = r
-
-            video.onerror = () => {
-                var elements = document.querySelector(`.objElement_${id}`);
-                if (elements) {
-                    elements.style.display = 'none'
-                }
-            }
-
-            video.onloadedmetadata = () => {
-                let vd = document.querySelector(`.id_${id}`)
-                if (vd) {
-                    vd.srcObject = r
-                }
-            }
-        }
-    };
-
-    let setPEER = (addST, type, r, dif) => { 
-        // Perform Connection
-        peerRef.current = new Peer(`${localStorage.getItem('id')}`, {
-            host: `peer-gvu0.onrender.com`,
-            path: `/stream`,
-        })
-
-        // Connect Check 
-        peerRef.current.on('open', (id) => {
-            if(type !== true){ 
-                socket.emit('join', dif(id))
-            }
-            else { 
-                socket.emit(`view`, {id: `${localStorage.getItem('id')}`})
-            }
-        })
-
-        peerRef.current.on('call', (call) => { 
-            call.answer(r)
-            call.on('stream', (vidstream) => { 
-               if(type !== true){ 
-                addST(vidstream, call.peer, null, display)
-               }
-               else { 
-                // console.log(vidstream)
-               }
-            })
-        })
-    }
 
     let CallBack = (r) => {
         if(streamdata.length < 1){ 
@@ -120,65 +65,40 @@ let Down = () => {
     
         //
 
-        socket.on('joined', (data) => {
-            setjoined(true)
-            // 
-            if (data.length > 0){ 
-                let filter = data.filter(v => v.id !== `${localStorage.getItem('id')}`)
-                if (filter !== undefined && filter.length > 0) { 
-                    setstreamdata(data)
-                    // 
-                    filter.map((v) => { 
-                        let call = peerRef.current.call(`${v.id}`, r)
-                        if (call !== undefined) { 
-                            call.on('stream', (vidstream) => { 
-                                addST(vidstream, call.peer, v, display)
-                            })
-                        }
-                    })
-                }
-            }
-        })
+        JOIND(r)
+
+        // socket.on('joined', (d) => {
+        //     if (d) {
+        //         let data = d.data
+        //         if (data.length > 0) {
+        //             let filter = data.filter(v => v.id !== `${localStorage.getItem('id')}`)
+        //             if (filter !== undefined && filter.length > 0) {
+        //                 setstreamdata(data)
+        //                 // 
+                        
+        //             }
+        //         }
+        //     }
+        // });
 
         //
 
     };
 
 
-    let NPP = () => { 
-        setPEER(null, true, null, null)
-            // 
+    let NPP = () => {
+        setPEER(null, true, null, dif)
+        // 
 
-            peerRef.current.on('call', (call) => { 
-                call.answer(null)
-                call.on('stream', (vidstream) => { 
-                    addST(vidstream, call.peer, null, display)
-                })
+        peerRef.current.on('call', (call) => {
+            call.answer(null)
+            call.on('stream', (vidstream) => {
+                addST(vidstream, call.peer, null, display)
             })
+        })
 
-            socket.on('joined', data => { 
-                if (data.length > 0){ 
-                    let filter = data.filter(v => v.id !== `${localStorage.getItem('id')}`)
-                    if (filter !== undefined && filter.length > 0) { 
-                        setstreamdata(data)
-                        // 
-                        filter.map((v) => { 
-                            let call = peerRef.current.call(`${v.id}`, new MediaStream(), {
-                                constraints: {
-                                    offerToReceiveAudio: true,
-                                    offerToReceiveVideo: true,
-                                }
-                            })
-                            if (call !== undefined) { 
-                                call.on('stream', (vidstream) => { 
-                                    addST(vidstream, call.peer, v, display)
-                                })
-                            }
-                        })
-                    }
-                }
-            });
-    }
+        JOIND()
+    };
 
     let heartBeat = () => { 
         setInterval(() => { 
@@ -199,7 +119,9 @@ let Down = () => {
         }, 3 * 2000)
     }
 
-    useLayoutEffect(() => {
+    const [h, seth] = useState(0)
+
+    useEffect(() => {
         try {
             NPP()
             heartBeat()
@@ -225,7 +147,7 @@ let Down = () => {
             //     }
             // });
         }
-        catch {
+        catch (e) {
             // if (isstream) {
             //     Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).addstream(true)
             // }
@@ -234,23 +156,23 @@ let Down = () => {
             //     heartBeat()
             // }
         }
-    }, []);
+    }, [streamdata]);
 
-  useLayoutEffect(() => { 
-    try {         
-      if (!isMobile) { 
-        Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).getSrc()
-      }
-    }
-    catch { 
-      toast.info(`Something's wrong. \t \n Please check your browser's access to your camera & audio setting`)
-    }
-  }, [])
+    useEffect(() => {
+        try {
+            if (!isMobile) {
+                Sad(source, setsource, isstream, setisstream, display, setdisplay, camera, setcamera, mic, setmic, facing, setfacing, stream, setstream, isMobile, Stream, toast, CallBack).getSrc()
+            }
+        }
+        catch {
+            toast.info(`Something's wrong. \t \n Please check your browser's access to your camera & audio setting`)
+        }
+    }, []);
 
 
     return (
         <div className=' videoviewpartsetup w-full h-full overflow-hidden flex items-center justify-between flex-col'>
-            <Up streamdata={streamdata} display={display} />
+            <Up display={display} />
             <div className="streamercontrolsaidnfoas pb-4 w-full p-4 flex items-center justify-center">
                 <div className="controlscenterilizers max-w-[1000px] join gap-1 flex items-center justify-evenly p-2 bg-[var(--border)] rounded-md shadow-md backdrop-blur-md brd w-full">
                     {
@@ -317,7 +239,11 @@ let Down = () => {
                             </div> : ''
                     }
 
-<div onClick={e => {setchat(chat ? false : true)}} className={`leftpartsaidna ${chat ? `bg-danger` : `bg-success`} cursor-pointer active:scale-[.90] transition-all join-item brd w-full items-center justify-center flex p-1`}>
+                    <div onClick={e => {
+                        let ct = chat ? false : true
+                        setchat(ct);
+                        localStorage.setItem('chat', ct)
+                    }} className={`leftpartsaidna ${chat ? `bg-danger` : `bg-success`} cursor-pointer active:scale-[.90] transition-all join-item brd w-full items-center justify-center flex p-1`}>
                         <i className={`bi ${chat ? `bi-chat-square-text` : `bi-chat-square`}`} />
                     </div>
 

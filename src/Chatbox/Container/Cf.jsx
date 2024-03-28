@@ -1,36 +1,33 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { toast } from 'react-toastify'
 import { Conn } from '../../Conn'
 import CT from './Chatb/CT'
-
+import * as FFMPEG from '@ffmpeg/ffmpeg'
+// 
 function Cf() {
 
-  const { sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, messages, setmessages, socket, setr, action, setaction, getReplyTo} = useContext(Conn)
+  const { DIRECT, SUB, ShareData, RepliesAD, EditTT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, messages, setmessages, socket, setr, action, setaction, getReplyTo} = useContext(Conn)
   // 
   const [sub, setsub] = useState(false)
-  //
-
 
   const [rl, setrl] = useState(0)
+  const flp = useRef()
 
 
   let filesp = (fl, i) => {
     let reader = new FileReader()
-    // 
 
     reader.onload = () => {
       try {
         let blob = URL.createObjectURL(fl[i])
 
-        const buf = new Uint8Array(reader.result);
-        
-        // 
+        const b = new Uint8Array(reader.result);
         let obj = file
-        // 
+
         obj.unshift({
           id: uuid().toUpperCase().split('-').join(''),
-          file: buf,
+          file: b,
           type: `${fl[i].type}`,
           name: `${fl[i].name}`,
           size: `${fl[i].size}`,
@@ -39,9 +36,9 @@ function Cf() {
           userid: localStorage.getItem('id')
         });
         // 
-        if (file.length > 10) {
-          if (i === 11) {
-            toast.error(`Enough! You've reached the limit (6) files per upload.`)
+        if (file.length > 30) {
+          if (i === 31) {
+            toast.error(`Enough! You've reached the limit (30) files per upload.`)
           }
         }
         else {
@@ -56,19 +53,35 @@ function Cf() {
     reader.readAsArrayBuffer(fl[i])
   };
 
+  let Compress = async (fl, name) => { 
+    try {
+      let ffmpeg = new FFMPEG.FFmpeg()
+      await ffmpeg.load()
+      await ffmpeg.writeFile(name, fl)
+      // 
+      await ffmpeg.exec(['-i', name, '-c:v', 'libx264', '-crf', '20', `output.mp4`])
+      let f = await ffmpeg.readFile(`output.mp4`)
+      console.log(f)
+    }
+    catch (e) {
+      console.log(e)
+      toast.error(`Unable to compress file. Please use other source to compress your file then upload or you may try again.`)
+    }
+  }
+
   const Change = (e) => {
     let fl = e.target.files
 
     if (fl.length > 0) {
       for (let i = 0; i < fl.length; i++) {
-        if (fl[i].size <= 50 * 1024 * 1024) {
+        if (fl[i].size <= 15 * 1024 * 1024) {
           filesp(fl, i)
         }
-        else if (fl[i].size > 50 * 1024 * 1024 && fl.length === 1) { 
-          filesp(fl, i)
-        }
-        else { 
-          toast.error(`Unable to upload this file (${fl[i].name}). Please just choose one of large files if you really want to upload it.`)
+        else {
+          toast.error(`Unable to upload this file (${fl[i].name}). It's too large. Please use a file compressor to compress the file to 1KB - 15MB.`)
+          if (flp.current) {
+            flp.current.value = ''
+          }
         }
       }
     }
@@ -88,77 +101,7 @@ function Cf() {
     }
   }
 
-  // Call this function when you want to create a new thread.
 
-  let ShareData = (repl, id) => { 
-    let data = {
-      input: input.trim().length < 1 ? '' : `<div clas="messageboxpath29039">${input}</div>`,
-      id: uuid().toUpperCase().split('-').join(''),
-      file: file,
-      replies: [],
-      time: new Date().getTime(),
-      sendid: localStorage.getItem('id'),
-      replid: repl ? id : null
-    }
-    return data
-  }
-
-  let DIRECT = () => {
-    // 
-    let data = ShareData()
-
-    let mes = messages
-    mes.push(data)
-    // 
-    EMPT(mes)
-    // 
-    sendSocket(null, data)
-  };
-
-  let RepliesAD = (id) => { 
-    let mes = messages
-    // 
-    let targetObject = findObjectByID(mes, id)
-    let repld = ShareData(true)
-
-    targetObject.replies.push(repld)
-    sendSocket(action.type, repld, id)
-    // 
-    EMPT(mes)
-    // 
-  }
-
-  let EditTT = (id) => { 
-    let mes = messages
-    // 
-    let targetObject = findObjectByID(mes, id)
-    targetObject.input = input.trim().length < 1 ? targetObject.input : input
-    targetObject.file = file.length < 1 ? targetObject.file : file
-
-    sendSocket(action.type, null, id, input, file)
-
-    EMPT(mes)
-  }
-
-
-  let SUB = () => {
-    if (file.length > 0 || input.trim().length > 0) {
-      if (action.type !== null) {
-        if (action.type.includes('reply')) {
-          RepliesAD(action.id)
-        }
-        else if (action.type.includes('edit')) {
-          EditTT(action.id)
-        }
-        else {
-          toast.error(`Action not yet verified`)
-        }
-      }
-      else {
-        DIRECT()
-      }
-    }
-  };
 
   return (
     <div className="idnaineadedse w-full flex flex-col items-start p-1 bg-[var(--border)]">
@@ -216,11 +159,16 @@ function Cf() {
           }
         }} ref={ref} onInput={e => { setinput(e.target.innerHTML) }} className={`diankkheaindes w-full bg-[var(--basebg)] join-item p-1 overflow-auto max-h-[100px] outline-none rounded-md brd`} contentEditable suppressContentEditableWarning />
         <div className="uploadandsub flex items-center justify-center join-item gap-1">
-          <input onChange={Change} multiple type="file" id="file" className="hidden" />
-          <label htmlFor="file">
-            <i className="bi text-[1.5rem] bg-[var(--basebg)] brd h-8 w-8 min-w-8 max-w-8 flex items-center justify-center cursor-pointer bi-plus" />
-          </label>
-          {file.length > 10 ? '' : <i onClick={!sub ? SUB : e => { }} className={`bi h-8 w-8 min-w-8 max-w-8 flex ${input.trim().length < 1 && file.length < 1 ? `bg-success opacity-[.4] pointer-events-none` : `bg-success`} items-center justify-center cursor-pointer bi-send`} />}
+          <input ref={flp} onChange={Change} multiple type="file" id="file" className="hidden" />
+          {
+            action.type === 'edit' ? getReplyTo(action.id) || getReplyTo(action.id) === '' ? '' :
+              <label htmlFor="file">
+                <i className="bi text-[1.5rem] bg-[var(--basebg)] brd h-8 w-8 min-w-8 max-w-8 flex items-center justify-center cursor-pointer bi-plus" />
+              </label> : <label htmlFor="file">
+              <i className="bi text-[1.5rem] bg-[var(--basebg)] brd h-8 w-8 min-w-8 max-w-8 flex items-center justify-center cursor-pointer bi-plus" />
+            </label>
+          }
+          {file.length > 30 ? '' : <i onClick={!sub ? e => {SUB()} : e => { }} className={`bi h-8 w-8 min-w-8 max-w-8 flex ${input.trim().length < 1 && file.length < 1 ? `bg-success opacity-[.4] pointer-events-none` : `bg-success`} items-center justify-center cursor-pointer bi-send`} />}
         </div>
       </div>
     </div>

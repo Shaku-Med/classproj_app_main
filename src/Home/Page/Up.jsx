@@ -1,31 +1,42 @@
-import React, { useState } from 'react'
+import React, { useContext, useLayoutEffect, useState } from 'react'
 import { JsonView, allExpanded, darkStyles, defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import ATJ from './ATJ';
 import MediaSession from './Mediasession';
+import { Conn } from '../../Conn';
 
-let Up = ({ display, streamdata }) => {
+let Up = ({ display }) => {
   const [prev, setprev] = useState(null)
+  const [st, setst] = useState([])
+  const { streamdata, r } = useContext(Conn)
+  
+  useLayoutEffect(() => { 
+    try {
+      setst(streamdata);
+    }
+    catch {}
+  }, [r, streamdata])
 
   return (
-    <div className={` ${streamdata.length > 1 ? 'stdadinad' : ''} streamcontainer overflow-auto h-full w-full p-2`}>
+    <div className={` ${st.length > 1 ? 'stdadinad' : ''} streamcontainer overflow-auto h-full w-full p-2`}>
       {
-        streamdata.length < 1 ?
+        st.length < 1 ?
           <>
             <div className="containersad text-center font-bold text-[2rem] flex items-center justify-center h-full w-full p-2">
               Sorry, stream is empty.
             </div>
           </> :
-          streamdata.map((val, key) => {
+          st.map((val, key) => {
             return (
-              <div key={key} className={`dianakestream objElement_${val.id} p-3 bg-[var(--border)] brd shadow-md rounded-md`}>
+              <div key={key} className={`dianakestream ${!val.active ? `relative opacity-[.3] pointer-events-none` : ``} objElement_${val.id} p-3 bg-[var(--border)] brd shadow-md rounded-md`}>
+                {
+                  !val.active ?
+                    <div className={`offState absolute top-0 left-0 flex items-center justify-center w-full h-full z-[100000] bg-[var(--border)] backdrop-blur-sm text-2xl uppercase font-bold`}>
+                      Offline
+                    </div> : ``
+                }
                 <div className="streamvideoc h-[300px] overflow-hidden">
-                  <video onError={e => {
-                    var elements = document.querySelector(`.objElement_${val.id}`);
-                    if (elements) {
-                      elements.style.display = 'none'
-                    }
-                  }} onLoadedMetadata={e => {
+                  <video onLoadedMetadata={e => {
                     let video = document.querySelectorAll('video')
                     if (video.length > 0) {
                       video.forEach(v => {
@@ -35,7 +46,7 @@ let Up = ({ display, streamdata }) => {
                       })
                     }
                     MediaSession()
-                  }} controls muted={val.id === localStorage.getItem('id')} autoPlay playsInline className={`id_${val.id} ${val.hasOwnProperty('display') ? val.display ? `` : `vpreinad` : ''} w-full h-full`}></video>
+                  }} poster='../favicon.ico' controls muted={val.id === localStorage.getItem('id')} autoPlay playsInline className={`id_${val.id} rounded-md overflow-hidden ${val.hasOwnProperty('display') ? val.display ? `` : `vpreinad` : ''} w-full h-full`}></video>
                 </div>
                 <div className="modalsnaidviews flex items-center justify-between mt-2 gap-2 p-1 rounded-md brd bg-[var(--basebg)]">
                   <a target='_blank' href={`https://www.whatismyip.com/search/?s=${val.ip}`} className="ipaddresshere">
