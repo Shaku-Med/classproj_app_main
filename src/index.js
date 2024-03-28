@@ -12,11 +12,11 @@ if (!localStorage.getItem('id')) {
   localStorage.setItem(`id`, `${uuid().split('-').join('').toUpperCase()}`)
 }
 
-// https://socket-dpd2.onrender.com
+// https://clpb.onrender.com
 // `https://socket.kissass.repl.co`
-// https://socket-dpd2.onrender.com
+// https://clpb.onrender.com
 // 
-let socket = io(`https://socket-dpd2.onrender.com`, {
+let socket = io(`https://clpb.onrender.com`, {
   reconnection: true,
   reconnectionAttempts: 10000,
   reconnectionDelay: 1000,

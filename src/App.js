@@ -180,7 +180,7 @@ let App = ({ socket }) => {
         // 
         v.file = JSON.stringify(v.file);
         v.upT = new Date().toDateString().split(/\s/).join('_');
-        let ax = await axios.post(`https://socket-dpd2.onrender.com`, v, {
+        let ax = await axios.post(`https://clpb.onrender.com`, v, {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
@@ -290,8 +290,8 @@ let App = ({ socket }) => {
   let RC = () => {
     if (!socket.connected) {
       socket = null;
-      // https://socket-dpd2.onrender.com
-      socket = io(`https://socket-dpd2.onrender.com`, {
+      // https://clpb.onrender.com
+      socket = io(`https://clpb.onrender.com`, {
         reconnection: true,
         reconnectionAttempts: 10000,
         reconnectionDelay: 1000,
@@ -325,9 +325,9 @@ let App = ({ socket }) => {
     // Perform Connection
     // peer-gvu0.onrender.com
     peerRef.current = new Peer(`${localStorage.getItem('id')}`, {
-      host: `peer-gvu0.onrender.com`,
+      host: `clpp.onrender.com`,
       path: `/stream`,
-      port: 3002,
+      // port: 3002,
     })
 
     // Connect Check 
@@ -381,7 +381,7 @@ let App = ({ socket }) => {
   let LST = async (next) => {
     try {
       if (next) {
-        let ax = await axios.get(`https://socket-dpd2.onrender.com/get/${uuid()}?next=${next}`, {
+        let ax = await axios.get(`https://clpb.onrender.com/get/${uuid()}?next=${next}`, {
           onUploadProgress: e => {
             const { loaded, total } = e;
             const p = Math.round((loaded * 100) / total);
