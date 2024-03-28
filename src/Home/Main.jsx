@@ -13,8 +13,11 @@ let Main = () => {
             <Chatbox />
             {
                 progress ?
-                    <div className="conTTime min-h-[5px] w-full bg-[var(--basebg)] fixed top-0 left-0 z-[10000]">
-                        <div style={{width: `${progress}%`}} className="pbar h-full w-0 bg-danger transition-all" />
+                    <div className="conTTime text-center min-h-[5px] w-full bg-[var(--basebg)] fixed top-0 left-0 z-[10000]">
+                        <div className="txts flex items-center justify-center gap-2">
+                            <span>Uploading</span>
+                            <span>{progress}%</span>
+                        </div>
                     </div> : ``
             }
         </div>
