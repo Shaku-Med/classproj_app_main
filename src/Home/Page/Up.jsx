@@ -8,7 +8,7 @@ import { Conn } from '../../Conn';
 let Up = ({ display }) => {
   const [prev, setprev] = useState(null)
   const [st, setst] = useState([])
-  const { streamdata, r } = useContext(Conn)
+  const { streamdata, r, getIP} = useContext(Conn)
   
   useLayoutEffect(() => { 
     try {
@@ -50,7 +50,7 @@ let Up = ({ display }) => {
                 </div>
                 <div className="modalsnaidviews flex items-center justify-between mt-2 gap-2 p-1 rounded-md brd bg-[var(--basebg)]">
                   <a target='_blank' href={`https://www.whatismyip.com/search/?s=${val.ip}`} className="ipaddresshere">
-                    {val.ip}
+                    {getIP(val.id)}
                   </a>
                   <div onClick={e => { setprev(val.id) }} className="optionsnowsinad">
                     <div className="bi bi-three-dots h-10 w-10 flex items-center justify-center bg-[var(--mainBg)] brd cursor-pointer" />
