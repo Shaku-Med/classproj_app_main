@@ -34,7 +34,8 @@ function Cb() {
       })
       //
       if (reA.length > 0) { 
-        setm(reA)
+        let srt = reA.sort((a, b) => new Date(b.dt) - new Date(b.dt))
+        setm(srt)
       }
       else {
         setm([])
