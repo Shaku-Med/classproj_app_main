@@ -86,12 +86,18 @@ function Cf() {
 
     if (fl.length > 0) {
       for (let i = 0; i < fl.length; i++) {
-        if (fl[i].size <= 200 * 1024 * 1024) {
+        if (fl[i].size <= 100 * 1024 * 1024) {
           filesp(fl, i)
-          flp.current.value = '';
+          // flp.current.value = '';
         }
         else {
-          toast.error(`Unable to upload this file (${fl[i].name}). It's too large. Please use a file compressor to compress the file to 1KB - 200MB.`)
+          // toast.error(`Unable to upload this file (${fl[i].name}). It's too large. Please use a file compressor to compress the file to 1KB - 100MB.`)
+          if (window.confirm(`This file is too large, Would you like to upload it? If YES, be prepared to wait as we chop the file in to 3MB each and upload them one by one. Are you weeling to wait? \n \n Press (OK) to continue or press (CANCLE) to ignore.`)) {
+            filesp(fl, i)
+            // if (flp.current) {
+            //   flp.current.value = ''
+            // }
+          }
         }
       }
     }
