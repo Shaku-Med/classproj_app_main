@@ -20,6 +20,8 @@ let App = ({ socket }) => {
 
         const [file, setfile] = useState([]);
         const [lk, setlk] = useState([]);
+  const [uplprev, setuplprev] = useState([]);
+  // 
         const [input, setinput] = useState('')
 
         let ref = useRef(null);
@@ -32,6 +34,7 @@ let App = ({ socket }) => {
         const [streamdata, setstreamdata] = useState([]);
         const [display, setdisplay] = useState(false);
         //
+        
 
         let getIP = (id) => {
                 if (streamdata.length > 0) {
@@ -170,6 +173,20 @@ let App = ({ socket }) => {
   let [psh, setpsh] = useState([]);
   const [dne, setdne] = useState(false)
 
+  let fileSplitter = () => {
+    try {
+
+    }
+    catch {
+      toast.info(`Upload crashed! Re-uploading... Be patient. Do not reload this page.`)
+    }
+  }
+
+
+  let handdLEF = () => { 
+
+  }
+
   let filRecur = async (s, jbj, fle) => {
     try {
       // let psh = []
@@ -177,38 +194,66 @@ let App = ({ socket }) => {
 
       if (s <= fle.length - 1) {
         let v = fle[s]
-        // 
-        v.file = JSON.stringify(v.file);
-        v.upT = new Date().toDateString().split(/\s/).join('_');
-        let ax = await axios.post(`https://clpb.onrender.com`, v, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          onUploadProgress: e => {
-            const { loaded, total } = e;
-            const p = Math.round((loaded * 100) / total);
-            setprogress(p)
-          },
-          onDownloadProgress: e => {
-            const { loaded, total } = e;
-            const p = Math.round((loaded * 100) / total);
-            if (p === 100) {
-              setprogress(null)
-            } else {
-              setprogress(p)
-            }
-          }
-        });
+        let nV = Object.assign({}, v)
+        if (v.file.length > 0) {
+          let len = nV.file.length
 
-        if (ax.data) {
-          v.file = `/${v.userid}/main/${v.upT}/${v.id}.json`;
-          v.preview = null;
-          v.isr = true
-          v.tty = `github`;
-          psh.push(v);
-          filRecur(s + 1, jbj, fle)
-        } else {
-          toast.error(`Upload canceled`);
+          let FLR = async (ob) => {
+            try {
+              // 
+              if (ob <= len - 1) {            
+                let fld = nV.file[ob]
+                // 
+                v.file = JSON.stringify(fld);
+                // 
+                v.upT = new Date().toDateString().split(/\s/).join('_');
+                v.ky = ob
+                // 
+                // https://clpb.onrender.com
+                let ax = await axios.post(`https://clpb.onrender.com`, v, {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  },
+                  onUploadProgress: e => {
+                    const { loaded, total } = e;
+                    const p = Math.round((loaded * 100) / total);
+                    setprogress(p)
+                  },
+                  onDownloadProgress: e => {
+                    const { loaded, total } = e;
+                    const p = Math.round((loaded * 100) / total);
+                    if (p === 100) {
+                      setprogress(null)
+                    } else {
+                      setprogress(p)
+                    }
+                  }
+                });
+
+                if (ax.data) {
+                  FLR(ob + 1);
+                } else {
+                  toast.error(`Upload canceled`);
+                }
+              }
+              else {
+                 v.file = `/${v.userid}/main/${v.upT}/${v.id}`;
+                  v.preview = null;
+                  v.isr = true
+                  v.tty = `github`;
+                  v.fileLength = len
+                  psh.push(v);
+                  filRecur(s + 1, jbj, fle)
+              }
+            }
+            catch {
+              FLR(ob)
+              toast.error(`Failed to upload, re - uploading. Please  wait.`)
+            }
+          };
+
+          FLR(0)
+
         }
       }
       else {
@@ -224,6 +269,7 @@ let App = ({ socket }) => {
           setprogress(null)
           psh = []
           setpsh([])
+          setfile([])
 
           if (socket.connected === false) {
             socket.connect();
@@ -749,19 +795,56 @@ let App = ({ socket }) => {
     }
   }
 
-  let setPV = async (src, isD, type, dty, id) => {
+
+  // GETTING FILE HERE
+
+  const [pvl, setpvl] = useState(false)
+
+
+  let GetFiles = (src, callback, len, type) => {
+    let psh = []
+    let FnC = async (ob) => {
+      try {
+        if (ob <= len - 1) {
+          let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}_${ob}.txt`);
+          psh.push(Object.values(ax.data));
+          FnC(ob + 1);
+        }
+        else {
+          if (psh.length > 0) {
+            callback(psh);
+          }
+          else {
+            callback(null)
+          }
+        }
+      }
+      catch {
+
+      }
+    };
+    
+    FnC(0)
+  };
+
+  let setPV = async (src, isD, type, dty, id, len) => {
     try {
       let N = CImg(id)
       if (N) {
+        setpvl(true)
         setpvT(N)
+        setpvl(false)
       }
       else {
         if (!isD) {
+          setpvl(true);
           let sc = src.file
           let blob = new Blob([sc], { type: src.type })
           let url = URL.createObjectURL(blob)
           // 
           setpvT(`${url}+${dty}`)
+          // 
+          setpvl(false);
           // 
           let ab = imgF
           let ob = {
@@ -772,23 +855,57 @@ let App = ({ socket }) => {
           setimgF(ab)
         }
         else {
-          let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`)
-          let b = new Uint8Array(Object.values(ax.data))
-          let bl = new Blob([b], { type: dty })
-          setpvT(`${URL.createObjectURL(bl)}+${dty}`)
-          // 
-          let ab = imgF
-          let ob = {
-            id: id,
-            url: `${URL.createObjectURL(bl)}+${dty}`
+          if (len) {
+            let callBack = (psh) => {
+              let totalSize = psh.reduce((acc, chunk) => acc + chunk.length, 0);
+
+              const concatenatedArrayBuffer = new Uint8Array(totalSize);
+              let offset = 0;
+              psh.forEach(chunk => {
+                concatenatedArrayBuffer.set(new Uint8Array(chunk), offset);
+                offset += chunk.length;
+              });
+
+              let b = new Uint8Array(concatenatedArrayBuffer)
+              let bl = new Blob([b], { type: dty })
+            
+              setpvT(`${URL.createObjectURL(bl)}+${dty}`)
+              // 
+              let ab = imgF
+              let ob = {
+                id: id,
+                url: `${URL.createObjectURL(bl)}+${dty}`
+              }
+              ab.push(ob)
+              setimgF(ab)
+              setpvl(false);
+            };
+            setpvl(true);
+            GetFiles(src, callBack, len, type);
           }
-          ab.push(ob)
-          setimgF(ab)
+          else {
+            setpvl(true);
+            let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`)
+            let b = new Uint8Array(Object.values(ax.data))
+            let bl = new Blob([b], { type: dty })
+            setpvT(`${URL.createObjectURL(bl)}+${dty}`)
+            // 
+            setpvl(false);
+            // 
+            let ab = imgF
+            let ob = {
+              id: id,
+              url: `${URL.createObjectURL(bl)}+${dty}`
+            }
+            ab.push(ob)
+            setimgF(ab)
+          }
         }
       }
     }
     catch {
       setpvT(null)
+      setpvl(false);
       toast.error(`Unable to load URL`)
     }
   };
@@ -858,11 +975,17 @@ let App = ({ socket }) => {
       {
         con ?
           isdomains ?
-            <Conn.Provider value={{ dif, issc, setissc, scl, SCRL, CImg, imgF, setimgF, progress, r, lk, setlk, SUB, DIRECT, ShareData, RepliesAD, EditTT, setPEER, display, setdisplay, addST, JOIND, setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr }}>
+            <Conn.Provider value={{ uplprev, setuplprev, GetFiles, dif, issc, setissc, scl, SCRL, CImg, imgF, setimgF, progress, r, lk, setlk, SUB, DIRECT, ShareData, RepliesAD, EditTT, setPEER, display, setdisplay, addST, JOIND, setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr }}>
               <Main />
               {
                 alrt && !chat ?
                   <Alrt setchat={setchat} audio={audio} alrt={alrt} setalrt={setalrt} /> : ``
+              }
+              {
+                pvl && !pvT ?
+                  <div style={{ zIndex: 10000000000000000 }} className="processingIconc bg-[var(--basebg)] backdrop-brightness-50 h-full fixed bottom-0 left-0 w-full flex items-center justify-center">
+                    <i className="loading opacity-[.8] w-10" />
+                  </div> : ``
               }
               <ToastContainer theme='dark' style={{ zIndex: 10000000000000000 }} position='bottom-center' />
             </Conn.Provider> :

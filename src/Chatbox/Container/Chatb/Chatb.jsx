@@ -93,8 +93,11 @@ function Chatb({ val, isrepl, RPLS}) {
                                 }
                                 {
                                     v.file.length < 1 ? '' :
-                                        <div className="innermessageboobles w-full text-[13px] bg-[var(--basebg)] p-1 rounded-md brd mt-1">
+                                        <div className="innermessageboobles overflow-auto relative w-full text-[13px] bg-[var(--basebg)] p-1 rounded-md brd mt-1">
                                             <CFILE val={v} />
+                                            <div className="loaderState absolute bottom-0 left-0 z-20 h-[5px] min-h-[5px] w-full">
+                                                <div className="loadC w-full h-full bg-primary" />
+                                            </div>
                                         </div>
                                 }
                                 {/* <div className="uploadtimeshow flex items-center w-full justify-between text-[10px]">

@@ -4,8 +4,8 @@ import { toast } from 'react-toastify'
 import {v4 as uuid} from 'uuid'
 import { Conn } from '../../../Conn'
 
-let Img = ({ loading, onLoad, className, src, isDEF, type, id}) => {
-    const { imgF, setimgF, CImg } = useContext(Conn);
+let Img = ({ loading, onLoad, className, src, isDEF, type, id, len}) => {
+    const { GetFiles, imgF, setimgF, CImg } = useContext(Conn);
     // 
     const ref = useRef(null)
     const [im, setim] = useState(null)
@@ -34,11 +34,32 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id}) => {
                 setim(isd)
             }
             else {
-                let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`)
-                let b = new Uint8Array(Object.values(ax.data))
-                let bl = new Blob([b], { type: `image/png` })
-                // 
-                setim(URL.createObjectURL(bl))
+                if (len) {
+                    let callBack = (psh) => {
+                        let totalSize = psh.reduce((acc, chunk) => acc + chunk.length, 0);
+
+                        const concatenatedArrayBuffer = new Uint8Array(totalSize);
+                        let offset = 0;
+                        psh.forEach(chunk => {
+                            concatenatedArrayBuffer.set(new Uint8Array(chunk), offset);
+                            offset += chunk.length;
+                        });
+
+                        let b = new Uint8Array(concatenatedArrayBuffer)
+                        let bl = new Blob([b], { type: `image/png` })
+            
+                        setim(URL.createObjectURL(bl));
+                       
+                    }
+                    GetFiles(src, callBack, len, type)
+                }
+                else {
+                    let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`)
+                    let b = new Uint8Array(Object.values(ax.data))
+                    let bl = new Blob([b], { type: `image/png` })
+                    // 
+                    setim(URL.createObjectURL(bl))
+                }
             }
         }
         catch (e) {

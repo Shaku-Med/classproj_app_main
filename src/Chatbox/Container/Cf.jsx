@@ -25,9 +25,20 @@ function Cf() {
         const b = new Uint8Array(reader.result);
         let obj = file
 
+        const chunkSize = 3 * 1024 * 1024; // 3MB
+        const chunks = [];
+        // for (let offset = 0; offset < b.length; offset += chunkSize) {
+        //   const chunk = b.subarray(offset, offset + chunkSize);
+        //   chunks.push(chunk);
+        // };
+
+        for (let offset = 0; offset < b.byteLength; offset += chunkSize) {
+          chunks.push(b.slice(offset, offset + chunkSize));
+        }
+
         obj.unshift({
           id: uuid().toUpperCase().split('-').join(''),
-          file: b,
+          file: chunks,
           type: `${fl[i].type}`,
           name: `${fl[i].name}`,
           size: `${fl[i].size}`,
@@ -46,14 +57,15 @@ function Cf() {
           setrl(uuid())
         }
       }
-      catch {
+      catch (e) {
+        console.log(e)
         toast.error(`Something went wrong.`)
       }
     }
     reader.readAsArrayBuffer(fl[i])
   };
 
-  let Compress = async (fl, name) => { 
+  let Compress = async (fl, name) => {
     try {
       let ffmpeg = new FFMPEG.FFmpeg()
       await ffmpeg.load()
@@ -67,21 +79,19 @@ function Cf() {
       console.log(e)
       toast.error(`Unable to compress file. Please use other source to compress your file then upload or you may try again.`)
     }
-  }
+  };
 
   const Change = (e) => {
     let fl = e.target.files
 
     if (fl.length > 0) {
       for (let i = 0; i < fl.length; i++) {
-        if (fl[i].size <= 15 * 1024 * 1024) {
+        if (fl[i].size <= 200 * 1024 * 1024) {
           filesp(fl, i)
+          flp.current.value = '';
         }
         else {
-          toast.error(`Unable to upload this file (${fl[i].name}). It's too large. Please use a file compressor to compress the file to 1KB - 15MB.`)
-          if (flp.current) {
-            flp.current.value = ''
-          }
+          toast.error(`Unable to upload this file (${fl[i].name}). It's too large. Please use a file compressor to compress the file to 1KB - 200MB.`)
         }
       }
     }
