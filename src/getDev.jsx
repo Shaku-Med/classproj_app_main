@@ -3,7 +3,7 @@ import React from 'react'
 let getDev = () => {
     try {
         let wd = window.location.origin
-        if (wd.includes(`http://localhost:3000`)) {
+        if (wd.includes(`https://clp-one.vercel.app`)) {
             return window.navigator.userAgent.split(/\s+/).join('')
         }
         else {
