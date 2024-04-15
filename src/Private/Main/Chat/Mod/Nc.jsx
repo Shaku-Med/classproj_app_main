@@ -41,9 +41,9 @@ let Nc = () => {
 
   return (
     <div className=''>
-      <div className="invitePath">
+      {/* <div className="invitePath">
         <div className="linkS p-2 text-sm select-text text-center bg-[var(--border)] brd">
-          https://localhost:3000?phone=209-20903-20909
+          https://clp-one.vercel.app/?phone=209-20903-20909
         </div>
         <div className="buttonSd flex items-center justify-center">
           <div className="button1 hover:bg-[var(--border)] cursor-pointer flex items-center justify-center w-full brd p-2">
@@ -58,7 +58,7 @@ let Nc = () => {
         <div className="itm! h-[1px] w-full bg-[var(--border)]" />
         <div className="Txt text-2xl uppercase opacity-[.8]">OR</div>
         <div className="itm! h-[1px] w-full bg-[var(--border)]" />
-      </div>
+      </div> */}
       <div className="ctIba">
         <div className="lagTxt capitalize text-center p-1 font-bold opacity-[.8]">
           Add new contact

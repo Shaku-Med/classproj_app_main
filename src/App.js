@@ -1373,11 +1373,15 @@ let App = ({ socket, k }) => {
     catch { }
   };
 
-  // useEffect(() => { 
+  // useEffect(() => {
   //   if (owner.length > 0 && users.length > 0 && k) {
   //     ReloadSocket()
   //   }
   // }, [owner, users])
+  
+  // useLayoutEffect(() => { 
+
+  // }, [])
 
 
   return (
