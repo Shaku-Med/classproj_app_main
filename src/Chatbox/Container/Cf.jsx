@@ -25,7 +25,7 @@ function Cf({isChat, callBack}) {
         const b = new Uint8Array(reader.result);
         let obj = file
 
-        const chunkSize = 3 * 1024 * 1024; // 3MB
+        const chunkSize = 2 * 1024 * 1024; // 3MB
         const chunks = [];
         // for (let offset = 0; offset < b.length; offset += chunkSize) {
         //   const chunk = b.subarray(offset, offset + chunkSize);

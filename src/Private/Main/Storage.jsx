@@ -195,7 +195,7 @@ let Storage = () => {
                         let bl = new Blob([b], { type: files[i].type })
                         let blob = URL.createObjectURL(bl)
 
-                        const chunkSize = 3 * 1024 * 1024; // 3MB
+                        const chunkSize = 2 * 1024 * 1024; // 3MB
                         const chunks = [];
                 
                         for (let offset = 0; offset < b.byteLength; offset += chunkSize) {
