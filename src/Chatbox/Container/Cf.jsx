@@ -5,9 +5,9 @@ import { Conn } from '../../Conn'
 import CT from './Chatb/CT'
 import * as FFMPEG from '@ffmpeg/ffmpeg'
 // 
-function Cf() {
+function Cf({isChat, callBack}) {
 
-  const { DIRECT, SUB, ShareData, RepliesAD, EditTT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, messages, setmessages, socket, setr, action, setaction, getReplyTo} = useContext(Conn)
+  const { chid, DIRECT, SUB, ShareData, RepliesAD, EditTT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, messages, setmessages, socket, setr, action, setaction, getReplyTo} = useContext(Conn)
   // 
   const [sub, setsub] = useState(false)
 
@@ -164,14 +164,19 @@ function Cf() {
                 {action.type}
               </div>
               <div className="ainkidinfilesad text-[11px] line-clamp-1 max-w-[50px] max-h-[17px]">
-                <CT userInput={getReplyTo(action.id)} />
+                <CT userInput={chid ? action.chid : getReplyTo(action.id)} />
               </div>
             </div> : ''
         }
         <div onKeyDown={e => {
           if (!e.shiftKey && e.key.toLowerCase().includes('enter')) {
             e.preventDefault()
-            SUB()
+            if (isChat) {
+              callBack()
+            }
+            else {
+              SUB()
+            }
           }
         }} ref={ref} onInput={e => { setinput(e.target.innerHTML) }} className={`diankkheaindes w-full bg-[var(--basebg)] join-item p-1 overflow-auto max-h-[100px] outline-none rounded-md brd`} contentEditable suppressContentEditableWarning />
         <div className="uploadandsub flex items-center justify-center join-item gap-1">
@@ -184,7 +189,14 @@ function Cf() {
               <i className="bi text-[1.5rem] bg-[var(--basebg)] brd h-8 w-8 min-w-8 max-w-8 flex items-center justify-center cursor-pointer bi-plus" />
             </label>
           }
-          {file.length > 30 ? '' : <i onClick={!sub ? e => {SUB()} : e => { }} className={`bi h-8 w-8 min-w-8 max-w-8 flex ${input.trim().length < 1 && file.length < 1 ? `bg-success opacity-[.4] pointer-events-none` : `bg-success`} items-center justify-center cursor-pointer bi-send`} />}
+          {file.length > 30 ? '' : <i onClick={!sub ? e => {
+            if (isChat) {
+              callBack()
+            }
+            else {
+              SUB()
+            }
+          } : e => { }} className={`bi h-8 w-8 min-w-8 max-w-8 flex ${input.trim().length < 1 && file.length < 1 ? `bg-success opacity-[.4] pointer-events-none` : `bg-success`} items-center justify-center cursor-pointer bi-send`} />}
         </div>
       </div>
     </div>

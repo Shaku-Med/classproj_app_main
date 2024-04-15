@@ -9,19 +9,27 @@ import io from 'socket.io-client'
 import * as Device from 'react-device-detect'
 import Peer from 'peerjs'
 import axios from 'axios'
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 import Alrt from './Home/Alrt';
+import Obj from './Obj';
+import Data from './Data';
+import CryptoJS from 'crypto-js'
 // 
 let audio = document.createElement('audio')
-// 
-let App = ({ socket }) => {
+    // 
+let App = ({ socket, k }) => {
 
         const [pvT, setpvT] = useState(null)
 
         const [file, setfile] = useState([]);
+        const [owner, setowner] = useState(k.hasOwnProperty('user') ? [k.user] : []);
         const [lk, setlk] = useState([]);
-  const [uplprev, setuplprev] = useState([]);
-  // 
+        const [uplprev, setuplprev] = useState([]);
+        const [users, setusers] = useState([]);
+        const [store, setstore] = useState([]);
+        // 
+        const [chid, setchid] = useState(0);
+        // 
         const [input, setinput] = useState('')
 
         let ref = useRef(null);
@@ -29,12 +37,16 @@ let App = ({ socket }) => {
         const peerRef = useRef(null);
         const [chat, setchat] = useState(null)
             // 
+        const [state_p, setstate_p] = useState(localStorage.getItem('isPrivate'))
+            // 
         const [r, setr] = useState(0)
             // 
         const [streamdata, setstreamdata] = useState([]);
         const [display, setdisplay] = useState(false);
+        const [pdata, setpdata] = useState(false);
+        const [pchatid, setpchatid] = useState(null);
         //
-        
+
 
         let getIP = (id) => {
                 if (streamdata.length > 0) {
@@ -79,10 +91,20 @@ let App = ({ socket }) => {
   const [messages, setmessages] = useState([]);
 
   let getReplyTo = (id) => {
-    let inp = findObjectByID(messages, id)
+    if (chid) {
+      let f = users.find(v => v.id === chid)
+      if (f) {
+        let inp = findObjectByID(f.messages, id)
 
-    return inp ? inp.input : ''
-  }
+        return inp ? inp.input : ''
+      }
+    }
+    else {
+      let inp = findObjectByID(messages, id)
+
+      return inp ? inp.input : ''
+    }
+  };
 
 
   
@@ -103,7 +125,9 @@ let App = ({ socket }) => {
         id: null
       })
 
-      setmessages(mes);
+      if (!chid) {
+         setmessages(mes);
+      }
       //
     }
   };
@@ -134,12 +158,27 @@ let App = ({ socket }) => {
     //     toast.info(`Unable to find action object to delete`)
     //   }
     // }
-    let m = messages
-    let f = m.findIndex(v => v.id === id)
-    if (f !== -1) { 
-      m.splice(f, 1)
-      setmessages(m)
-      setr(uuid())
+    if (chid) {
+      let u = users
+      let fl = u.find(v => v.id === chid)
+      if (fl) {
+        let m = fl.messages
+        let f = m.findIndex(v => v.id === id)
+        if (f !== -1) {
+          m.splice(f, 1)
+          setusers(u)
+          setcrl(uuid())
+        }
+      }
+    }
+    else {
+      let m = messages
+      let f = m.findIndex(v => v.id === id)
+      if (f !== -1) {
+        m.splice(f, 1)
+        setmessages(m)
+        setr(uuid())
+      }
     }
   };
 
@@ -183,8 +222,16 @@ let App = ({ socket }) => {
   }
 
 
-  let handdLEF = () => { 
-
+  let handdLEF = (data) => { 
+    try {
+      if (chid) {
+        return Obj.encDec(JSON.stringify(data), `${k.m}+${window.navigator.userAgent.split(/\s+/).join('')}`)
+      }
+      else {
+        return data
+      }
+    }
+    catch {}
   }
 
   let filRecur = async (s, jbj, fle) => {
@@ -201,18 +248,26 @@ let App = ({ socket }) => {
           let FLR = async (ob) => {
             try {
               // 
-              if (ob <= len - 1) {            
+              if (ob <= len - 1) {
                 let fld = nV.file[ob]
                 // 
                 v.file = JSON.stringify(fld);
                 // 
                 v.upT = new Date().toDateString().split(/\s/).join('_');
                 v.ky = ob
-                // 
+                //
+
+                let date = new Date();
+                let abo = {
+                  exp: date.setSeconds(date.getSeconds() + 10),
+                };
+
+                v.Authorization = Obj.encDec(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`)
+                v.isAuth = localStorage.getItem('userid')
                 // https://clpb.onrender.com
                 let ax = await axios.post(`https://clpb.onrender.com`, v, {
                   headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
                   },
                   onUploadProgress: e => {
                     const { loaded, total } = e;
@@ -237,13 +292,15 @@ let App = ({ socket }) => {
                 }
               }
               else {
-                 v.file = `/${v.userid}/main/${v.upT}/${v.id}`;
-                  v.preview = null;
-                  v.isr = true
-                  v.tty = `github`;
-                  v.fileLength = len
-                  psh.push(v);
-                  filRecur(s + 1, jbj, fle)
+                v.file = `/${v.userid}/main/${v.upT}/${v.id}`;
+                v.preview = null;
+                v.Authorization = null;
+                v.isAuth = null;
+                v.isr = true
+                v.tty = `github`;
+                v.fileLength = len
+                psh.push(v);
+                filRecur(s + 1, jbj, fle)
               }
             }
             catch {
@@ -258,14 +315,21 @@ let App = ({ socket }) => {
       }
       else {
         if (psh.length > 0) {
-          data.file = psh;
-          socket.emit(`sendchat`, {
+          data.file = ISB(psh, true);
+          let og = {
             type: type,
             data: data,
             id: id,
             input: inp,
             file: []
-          });
+          }
+          MainSaves(handdLEF(og))
+          if (chid) {
+            socket.emit(`privatechat`, handdLEF(og));
+          }
+          else {
+            socket.emit(`sendchat`, handdLEF(og));
+          }
           setprogress(null)
           psh = []
           setpsh([])
@@ -284,13 +348,39 @@ let App = ({ socket }) => {
     }
   };
 
+  let MainSaves = async (dobj) => {
+    try {
+      if (chid) {
+        let date = new Date()
+        let ob = {
+          exp: date.setSeconds(date.getSeconds() + 20),
+        }
+        let ax = await axios.post(`https://clpb.onrender.com/private/sendchat/${uuid()}`, { Authorization: Obj.encDec(JSON.stringify(ob), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`), isAuth: localStorage.getItem('userid'), data: dobj })
+      }
+      else {
+        let date = new Date()
+        let ob = {
+          exp: date.setSeconds(date.getSeconds() + 20),
+        }
+        let ax = await axios.post(`https://clpb.onrender.com/sendchat/add/${uuid()}`, { Authorization: Obj.encDec(JSON.stringify(ob), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`), isAuth: localStorage.getItem('userid'), data: dobj })
+        
+      }
+    }
+    catch {
+      toast.error(`Unable to send message, re-submitting.`)
+      setTimeout(() => {
+        MainSaves(dobj)
+      }, 2000)
+    }
+  };
+
 
   let sendSocket = (type, data, id, inp, fil) => {
     try {
       if (data) {
         if (file.length > 0) {
           if (type !== 'edit') {
-            let jbj = {type, data, id, inp, fil};
+            let jbj = { type, data, id, inp, fil };
             filRecur(0, jbj, file)
             setfile([])
           }
@@ -299,13 +389,20 @@ let App = ({ socket }) => {
           }
         }
         else {
-          socket.emit(`sendchat`, {
+          let oj = {
             type: type,
             data: data,
             id: id,
-            input: inp,
-            file: fil
-          })
+            input: ISB(inp),
+            file: ISB(fil, true)
+          }
+          MainSaves(handdLEF(oj))
+          if(chid){
+            socket.emit(`privatechat`, handdLEF(oj))
+          }
+          else {
+            socket.emit(`sendchat`, handdLEF(oj))
+          }
           // 
           if (socket.connected === false) {
             socket.connect()
@@ -314,13 +411,36 @@ let App = ({ socket }) => {
       
       }
       else {
-        socket.emit(`sendchat`, {
+        let gD = (d) => { 
+          if (chid) {
+            let obj = {}
+            if (d) {
+              obj = {...d, sendid: getID()}
+            }
+            else {
+              obj = {sendid: getID()}
+            }
+            // 
+            return obj
+          }
+          else {
+            return d
+          }
+        }
+        let oj = {
           type: type,
-          data: data,
+          data: gD(data),
           id: id,
-          input: inp,
-          file: fil
-        })
+          input: ISB(inp),
+          file: ISB(fil, true)
+        }
+        MainSaves(handdLEF(oj))
+        if(chid){
+          socket.emit(`privatechat`, handdLEF(oj))
+        }
+        else {
+          socket.emit(`sendchat`, handdLEF(oj))
+        }
         // 
         if (socket.connected === false) {
           socket.connect()
@@ -335,15 +455,10 @@ let App = ({ socket }) => {
 
   let RC = () => {
     if (!socket.connected) {
-      socket = null;
-      // https://clpb.onrender.com
-      socket = io(`https://clpb.onrender.com`, {
-        reconnection: true,
-        reconnectionAttempts: 10000,
-        reconnectionDelay: 1000,
-        debug: true
-      });
+      socket.disconnect()
+      socket.connect()
     }
+
   };
 
   let Rconnect = () => {
@@ -427,22 +542,33 @@ let App = ({ socket }) => {
   let LST = async (next) => {
     try {
       if (next) {
-        let ax = await axios.get(`https://clpb.onrender.com/get/${uuid()}?next=${next}`, {
-          onUploadProgress: e => {
-            const { loaded, total } = e;
-            const p = Math.round((loaded * 100) / total);
-            setprogress(p)
-          },
-          onDownloadProgress: e => {
-            const { loaded, total } = e;
-            const p = Math.round((loaded * 100) / total);
-            if (p === 100) {
-              setprogress(null)
-            } else {
-              setprogress(p)
-            }
-          }
-        })
+
+        let date = new Date()
+        let ob = {
+          exp: date.setSeconds(date.getSeconds() + 20),
+        }
+
+
+        // https://clpb.onrender.com
+        let ax = await axios.post(`https://clpb.onrender.com/get/${uuid()}?next=${next}`, {
+          Authorization: Obj.encDec(JSON.stringify(ob), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
+          isAuth: localStorage.getItem('userid')
+        }, {
+          // onUploadProgress: e => {
+          //   const { loaded, total } = e;
+          //   const p = Math.round((loaded * 100) / total);
+          //   setprogress(p)
+          // },
+          // onDownloadProgress: e => {
+          //   const { loaded, total } = e;
+          //   const p = Math.round((loaded * 100) / total);
+          //   if (p === 100) {
+          //     setprogress(null)
+          //   } else {
+          //     setprogress(p)
+          //   }
+          // }
+        });
         let d = ax.data
         if (d) {
           let data = d.data
@@ -544,33 +670,74 @@ let App = ({ socket }) => {
       catch (e) {}
     });
   }
+
+  const [crl, setcrl] = useState(0)
   
   let DIRECT = (d) => {
-    // 
     let data = d ? d : ShareData()
-
-    let mes = messages
-    
-    if (!d) {
-      mes.push(data)
+    if (chid) {
+      // if (d) {
+      //   d.sendid = getID()
+      //   d.file = ISB(d.file, true)
+      //   d.input = ISB(d.input)
+      // }
       // 
-      EMPT(mes)
-      // 
-      sendSocket(null, data)
-    }
-    else {
-      if (mes.length > 0) {
-        let f = mes.filter(v => d.id !== v.id)
-        if (f.length > 0) {
-          f.push(d)
-          setmessages(f)
+      let urs = users
+      let u = urs.find(v => v.id === chid)
+      if (u) {
+        let mes = u.messages
+        // 
+        if (!d) {
+          mes.push(data)
+          setusers(urs)
+          setcrl(uuid())
+          EMPT()
+          // 
+          sendSocket(null, data)
+        }
+        else {
+          if (mes.length > 0) {
+            let f = mes.filter(v => d.id !== v.id)
+            if (f.length > 0) {
+              f.push(d)
+              setusers(urs)
+              setcrl(uuid())
+            }
+          }
+          else {
+            mes = [data]
+            setusers(urs)
+            setcrl(uuid())
+          }
         }
       }
-      else {
-        mes = [data]
-        setmessages(mes)
-        setr(uuid())
+    }
+    else {
+      // 
+
+      let mes = messages
+    
+      if (!d) {
+        mes.push(data)
         // 
+        EMPT(mes)
+        // 
+        sendSocket(null, data)
+      }
+      else {
+        if (mes.length > 0) {
+          let f = mes.filter(v => d.id !== v.id)
+          if (f.length > 0) {
+            f.push(d)
+            setmessages(f)
+          }
+        }
+        else {
+          mes = [data]
+          setmessages(mes)
+          setr(uuid())
+          // 
+        }
       }
     }
   };
@@ -611,16 +778,82 @@ let App = ({ socket }) => {
   };
 
 
-    // Call this function when you want to create a new thread.
+  // Call this function when you want to create a new thread.
+
+  let ISB = (isenck, isfile, isK) => {
+    try {
+      if (chid) {
+        let u = users.find(v => v.id === chid)
+        if (u) {
+          let flt = owner[0].contacts.find(v => v.phone === u.phone)
+          if (flt) {
+            if (isenck) {
+              let s = flt.enck.sort((a, b) => new Date(b.t) - new Date(a.t))
+              if (s.length > 0) {
+                if (isK) {
+                  return s[0].k
+                }
+                else {
+                  if (isfile) {
+                    return isenck.length > 0 ? [CryptoJS.AES.encrypt(JSON.stringify(isenck), `${s[0].k}`).toString()] : []
+                  }
+                  else {
+                    return CryptoJS.AES.encrypt(JSON.stringify(isenck), `${s[0].k}`).toString()
+                  }
+                }
+              }
+              else {
+                return ''
+              }
+            }
+            else {
+              return flt.blocked
+            }
+          }
+        }
+      }
+      else {
+        return isenck
+      }
+    }
+    catch {
+      return ''
+    }
+  };
+  
+  let getID = () => {
+    try {
+      if (chid) {
+        if (owner.length > 0) { 
+          return {
+            from: owner[0].id,
+            top: chid,
+            isb: ISB(),
+            isk: ISB('...', null, true),
+            ist: new Date().toDateString()
+          }
+        }
+        else {
+          return null
+        }
+      }
+      else {
+        return localStorage.getItem('id')
+      }
+    }
+    catch {
+      return null
+    }
+  }
 
   let ShareData = (repl, id) => { 
     let data = {
-      input: input.trim().length < 1 ? '' : `<div clas="messageboxpath29039">${input}</div>`,
+      input: input.trim().length < 1 ? '' : ISB(`<div clas="messageboxpath29039">${input}</div>`),
       id: uuid().toUpperCase().split('-').join(''),
-      file: file,
+      file: ISB(file, true),
       replies: [],
       time: new Date().getTime(),
-      sendid: localStorage.getItem('id'),
+      sendid: getID(),
       replid: repl ? id : null
     }
     return data
@@ -633,12 +866,11 @@ let App = ({ socket }) => {
     // let targetObject = findObjectByID(mes, id)
     let repld = dta ? dta : ShareData(true)
     DIRECT(repld);
-    // 
-    setr(uuid())
-    if (!dta) {
-      sendSocket(action.type, repld, id);
-      EMPT(mes);
-    }
+      setr(uuid())
+      if (!dta) {
+        sendSocket(action.type, repld, id);
+        EMPT(mes);
+      }
     // 
     // if (!dta) {
     //   // targetObject.replies.push(repld)
@@ -650,17 +882,33 @@ let App = ({ socket }) => {
     // }
   };
 
-  let EditTT = (id) => { 
-    let mes = messages
-    // 
-    let targetObject = findObjectByID(mes, id)
-    targetObject.input = input.trim().length < 1 ? targetObject.input : input
-    targetObject.file = file.length < 1 ? targetObject.file : file
+  let EditTT = (id) => {
+    if (chid) {
+      let f = users.find(v => v.id === chid)
+      if (f) {
+        let mes = f.messages
+        // 
+        let targetObject = findObjectByID(mes, id)
+        targetObject.input = input.trim().length < 1 ? targetObject.input : ISB(input)
+        targetObject.file = file.length < 1 ? targetObject.file : ISB(file, true)
+        // 
+        sendSocket(action.type, null, id, input, file)
 
-    sendSocket(action.type, null, id, input, file)
+        EMPT(mes)
+      }
+    }
+    else {
+      let mes = messages
+      // 
+      let targetObject = findObjectByID(mes, id)
+      targetObject.input = input.trim().length < 1 ? targetObject.input : input
+      targetObject.file = file.length < 1 ? targetObject.file : file
 
-    EMPT(mes)
-  }
+      sendSocket(action.type, null, id, input, file)
+
+      EMPT(mes)
+    }
+  };
 
   const [alrt, setalrt] = useState(null)
   const [issc, setissc] = useState(false)
@@ -669,7 +917,6 @@ let App = ({ socket }) => {
     try {
       socket.on('connect', () => {
         //
-
         clearTimeout(RC)
         
         if (localStorage.getItem('id')) {
@@ -760,12 +1007,78 @@ let App = ({ socket }) => {
             }
           }
         })
+
+        // PRIVATE CHAT
+
+        JOIND()
         
       });
 
-      JOIND()
+      socket.on('resets', () => { 
+        setusrl(uuid())
+      })
+
+      socket.on('pmessage', data => {
+        try {
+          if (owner.length > 0) {
+            let dt = JSON.parse(CryptoJS.AES.decrypt(data.messages, k.s).toString(CryptoJS.enc.Utf8))
+            if (dt) {
+              let us = users
+              let getF = (tx) => {
+                if (dt.type === 'edit' || dt.type === 'delete') {
+                  return dt.data.sendid[tx]
+                }
+                else {
+                  return dt.sendid[tx]
+                }
+              }
+              let compare = getF('from') === owner[0].id ? getF('top') : getF('from')
+              let u = us.find(v => v.id === compare)
+              if (u) {
+                let m = u.messages[dt.type === 'delete' ? 'findIndex' : 'find'](v => v.id === dt.id)
+                let st = dt.type === 'delete' ? m !== -1 : m
+                if (st) {
+                  if (dt.type === 'delete') {
+                    if (typeof m === 'number') {
+                      // console.log(u.messages)
+                      u.messages.splice(m, 1)
+                      // 
+                      setusers(us)
+                      setcrl(uuid())
+                    }
+                  }
+                  else if (dt.type === 'edit') {
+                    m.file = dt.file
+                    m.input = dt.input;
+                    // 
+                    setusers(us)
+                    setcrl(uuid())
+                  }
+                 
+                }
+                else {
+                  if (dt.type !== 'delete') {
+                    u.messages.push(dt)
+                    // 
+                    setusers(us)
+                    setcrl(uuid())
+                  }
+                }
+              }
+            }
+          }
+          else {
+            localStorage.clear();
+          }
+        }
+        catch (e) {
+          console.log(e)
+        }
+      });
+
 
       socket.on('disconnect', () => {
+        console.log('disconnected')
         Rconnect()
       })
       
@@ -776,7 +1089,7 @@ let App = ({ socket }) => {
     catch {
       toast.error(`Unable to get chat messages`)
     }
-  }, [r]);
+  }, [r, crl]);
 
   const [imgF, setimgF] = useState([])
 
@@ -842,14 +1155,14 @@ let App = ({ socket }) => {
           let blob = new Blob([sc], { type: src.type })
           let url = URL.createObjectURL(blob)
           // 
-          setpvT(`${url}+${dty}`)
+          setpvT(`${url}+${dty}+${id}`)
           // 
           setpvl(false);
           // 
           let ab = imgF
           let ob = {
             id: id,
-            url: `${url}+${dty}`
+            url: `${url}+${dty}+${id}`
           }
           ab.push(ob)
           setimgF(ab)
@@ -869,12 +1182,12 @@ let App = ({ socket }) => {
               let b = new Uint8Array(concatenatedArrayBuffer)
               let bl = new Blob([b], { type: dty })
             
-              setpvT(`${URL.createObjectURL(bl)}+${dty}`)
+              setpvT(`${URL.createObjectURL(bl)}+${dty}+${id}`)
               // 
               let ab = imgF
               let ob = {
                 id: id,
-                url: `${URL.createObjectURL(bl)}+${dty}`
+                url: `${URL.createObjectURL(bl)}+${dty}+${id}`
               }
               ab.push(ob)
               setimgF(ab)
@@ -888,14 +1201,14 @@ let App = ({ socket }) => {
             let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`)
             let b = new Uint8Array(Object.values(ax.data))
             let bl = new Blob([b], { type: dty })
-            setpvT(`${URL.createObjectURL(bl)}+${dty}`)
+            setpvT(`${URL.createObjectURL(bl)}+${dty}+${id}`)
             // 
             setpvl(false);
             // 
             let ab = imgF
             let ob = {
               id: id,
-              url: `${URL.createObjectURL(bl)}+${dty}`
+              url: `${URL.createObjectURL(bl)}+${dty}+${id}`
             }
             ab.push(ob)
             setimgF(ab)
@@ -907,6 +1220,30 @@ let App = ({ socket }) => {
       setpvT(null)
       setpvl(false);
       toast.error(`Unable to load URL`)
+    }
+  };
+
+  // GET KUSR 
+  let getKUser = (issingle, isv) => {
+    let u = k.user
+    if (u) {
+      if (issingle) {
+        if (isv) {
+          let f = isv.picture.sort((a, b) => new Date(b.time) - new Date(a.time))
+          return f[0]
+        }
+        else {
+          let f = u.picture.sort((a, b) => new Date(b.time) - new Date(a.time))
+          return f[0]
+        }
+      }
+      else {
+        let f = u.picture.sort((a, b) => new Date(b.time) - new Date(a.time))
+        return f
+      }
+    }
+    else {
+      return null
     }
   };
 
@@ -970,12 +1307,85 @@ let App = ({ socket }) => {
 
   const [t, sett] = useState(false)
 
+  const [scp, setscp] = useState([])
+  const [usrl, setusrl] = useState(0)
+  const [pvid, setpvid] = useState(0)
+  //
+
+
+  let addUsr = (data) => {
+    console.log(data)
+  }
+
+
+  let filtME = (v, time, isfile, hasId) => {
+    try {
+      let cid = hasId ? hasId : chid
+      if (cid) {
+        let u = users.find(v => v.id === cid)
+        if (u) {
+          let flt = owner[0].contacts.find(v => v.phone === u.phone)
+          if (flt) {
+            let s = flt.enck.sort((a, b) => new Date(b.t) - new Date(a.t))
+            if (s.length > 0) {
+              let separateTime = new Date(time);
+              let objectInRange = s.find((item, index) => {
+                let currentTime = new Date(item.t);
+                let nextTime = index < s.length - 1 ? new Date(s[index + 1].t) : Infinity;
+                return currentTime <= separateTime
+              });
+              if (isfile) {
+                return JSON.parse(CryptoJS.AES.decrypt(v[0], `${objectInRange.k}`).toString(CryptoJS.enc.Utf8))
+              }
+              else {
+                return JSON.parse(CryptoJS.AES.decrypt(v, `${objectInRange.k}`).toString(CryptoJS.enc.Utf8))
+              }
+            }
+            else {
+              return ''
+            }
+          }
+        }
+      }
+      else {
+        return v
+      }
+    }
+    catch {
+      return isfile ? [] : ''
+    }
+  };
+
+  let ReloadSocket = () => {
+    try {
+      if (owner.length > 0) {
+        let mp = owner[0].contacts
+        let u = users.filter(v => mp.some(a => a.phone === v.phone))
+        if (u.length > 0) {
+          let m = u.flatMap(v => v.id)
+          let ch = m.find(v => JSON.stringify(v).includes('picture'))
+          if (!ch) {
+           socket.emit(`reset`,  Obj.encDec(JSON.stringify(m), `${k.m}+${window.navigator.userAgent.split(/\s+/).join('')}`))
+          }
+        }
+      }
+    }
+    catch { }
+  };
+
+  // useEffect(() => { 
+  //   if (owner.length > 0 && users.length > 0 && k) {
+  //     ReloadSocket()
+  //   }
+  // }, [owner, users])
+
+
   return (
     <>
       {
-        con ?
+        con && k ?
           isdomains ?
-            <Conn.Provider value={{ uplprev, setuplprev, GetFiles, dif, issc, setissc, scl, SCRL, CImg, imgF, setimgF, progress, r, lk, setlk, SUB, DIRECT, ShareData, RepliesAD, EditTT, setPEER, display, setdisplay, addST, JOIND, setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr }}>
+            <Conn.Provider value={{ store, setstore, ReloadSocket, pvid, setpvid, filtME, addUsr, getID, MainSaves, crl, setcrl, chid, setchid, users, setusers, owner, setowner, getKUser, pchatid, setpchatid, pdata, setpdata, k, scp, setscp, state_p, setstate_p, uplprev, setuplprev, GetFiles, dif, issc, setissc, scl, SCRL, CImg, imgF, setimgF, progress, r, lk, setlk, SUB, DIRECT, ShareData, RepliesAD, EditTT, setPEER, display, setdisplay, addST, JOIND, setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr }}>
               <Main />
               {
                 alrt && !chat ?
@@ -986,6 +1396,10 @@ let App = ({ socket }) => {
                   <div style={{ zIndex: 10000000000000000 }} className="processingIconc bg-[var(--basebg)] backdrop-brightness-50 h-full fixed bottom-0 left-0 w-full flex items-center justify-center">
                     <i className="loading opacity-[.8] w-10" />
                   </div> : ``
+              }
+              {
+                k.isAuth ?
+                  <Data addUsr={addUsr} setrl={setusrl} rl={usrl}/> : ''
               }
               <ToastContainer theme='dark' style={{ zIndex: 10000000000000000 }} position='bottom-center' />
             </Conn.Provider> :

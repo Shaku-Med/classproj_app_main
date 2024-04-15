@@ -39,7 +39,7 @@ let Chatbox = () => {
   }, [])
   // 
   return (
-    <div className={`${chat ? `w-full max-w-[400px] max-[780px]:max-w-full transition-all aidnlkaindkeis h-full bg-[var(--basebg)] max-[780px]:max-h-[50%] opacity-1` : ` max-[780px]:h-0 max-[780px]:w-full w-0 opacity-0 pointer-events-none`} transition-all`}>
+    <div className={`${chat ? `w-full max-w-[400px] max-[780px]:max-w-full transition-all aidnlkaindkeis h-full bg-[var(--basebg)] max-[780px]:min-h-[70%] opacity-1` : ` max-[780px]:h-0 max-[780px]:w-full w-0 opacity-0 pointer-events-none`} transition-all`}>
       {
         chat ?
           <Container /> : ''

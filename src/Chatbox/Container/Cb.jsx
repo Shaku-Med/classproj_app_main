@@ -2,9 +2,10 @@ import React, { useContext, useLayoutEffect, useRef, useState } from 'react'
 import { Conn } from '../../Conn';
 import Chatb from './Chatb/Chatb';
 import ATJ from '../../Home/Page/ATJ';
+import { motion, AnimatePresence } from 'framer-motion';
 
-function Cb() {
-  const { issc, setissc, chat, SCRL, scl, messages, setmessages, socket,  setPV, pvT, setpvT, r} = useContext(Conn);
+function Cb({msga}) {
+  const { chid, crl, users, scp, setscp, issc, setissc, chat, SCRL, scl, messages, setmessages, socket,  setPV, pvT, setpvT, r} = useContext(Conn);
   //  YOU CAN ACTIVATE THE AUTO SCROLL ON THIS PAGE.... IF YOU'D LIKE
   // 
   const [m, setm] = useState([])
@@ -22,7 +23,8 @@ function Cb() {
         return `${month}-${day}-${year}`;
       };
 
-      messages.map(v => {
+      let mg = msga ? msga : messages
+      mg.map(v => {
         const formattedDate = getFormattedDate(v.time);
         const existingGroupIndex = reA.findIndex(group => group.date === formattedDate);
         // 
@@ -34,8 +36,8 @@ function Cb() {
       })
       //
       if (reA.length > 0) { 
-        let srt = reA.sort((a, b) => new Date(a.dt) - new Date(b.dt))
-        setm(srt)
+        let srt = reA.sort((a, b) => new Date(b.dt) - new Date(a.dt))
+        setm(srt.reverse())
       }
       else {
         setm([])
@@ -43,12 +45,24 @@ function Cb() {
       // 
     }
     catch { }
-  }, [messages, r]);
+  }, [messages, r, msga, users, crl, chid]);
   // 
-  let Fm = (time, type) => { 
-    let d = new Date(time)
-    return !type ? `${d.getDay() === new Date().getDay() ? `Today` : d.getDay() === new Date().getDay() - 1 ? 'Yesterday' : d.toDateString()}` : d.toLocaleString()
-  }
+  let Fm = (time, type) => {
+    let d = new Date(time);
+    if (!type) {
+      let today = new Date();
+      if (d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) {
+        return 'Today';
+      } else if (d.getDate() === today.getDate() - 1 && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) {
+        return 'Yesterday';
+      } else {
+        return d.toDateString();
+      }
+    } else {
+      return d.toLocaleString();
+    }
+  };
+
 
   let RPLS = (id) => {
     try {
@@ -70,8 +84,11 @@ function Cb() {
 
   useLayoutEffect(() => {
     let ch = document.querySelector('.imageinaodkichatbox')
-    if (chat && ch) {
-      setTimeout(SCRL, 2000)
+    let s = scp
+    let flt = s.find(v => v.id === 'public')
+    // 
+    if (chat && ch && !flt) {
+      setTimeout(SCRL, 1000)
       // 
       // Assuming `ch` is your scrolling element
       ch.addEventListener('scroll', function (e) {
@@ -83,10 +100,55 @@ function Cb() {
         let proximityThreshold = 200;
 
         setissc(distanceToBottom <= proximityThreshold)
+
+        //
+
+        let ob = {
+          id: 'public',
+          sp: scrollTop
+        }
+
+        let f = s.find(v => v.id === 'public')
+        if (f) {
+          f.sp = scrollTop
+          setscp(s)
+        }
+        else {
+          s.push(ob)
+          setscp(s)
+        }
       });
 
     }
+    else if (chat && ch && flt) {
+      setTimeout(() => {
+        ch.scrollTo(0, flt.sp)
+        // 
+        ch.addEventListener('scroll', e => {
+
+          let scrollTop = e.target.scrollTop;
+
+          let ob = {
+            id: 'public',
+            sp: scrollTop
+          }
+
+          let f = s.find(v => v.id === 'public')
+          if (f) {
+            f.sp = scrollTop
+            setscp(s)
+          }
+          else {
+            s.push(ob)
+            setscp(s)
+          }
+
+        })
+      }, 200)
+    }
   }, [chat]);
+
+  const [ads, setads] = useState(null)
 
   return (
     <div ref={rf} className="imageinaodkichatbox transition-all absolute bottom-0 w-full overflow-auto max-h-full pb-4">
@@ -118,9 +180,12 @@ function Cb() {
 
             {
               pvT !== null ?
-                <div className="modalsiandpinchloandhigh fixed top-0 left-0 w-full h-full backdrop-blur-md z-[100000000]">
-                  <ATJ isprev={true} />
-                </div> : ''
+                <AnimatePresence>
+                  <motion.div initial={{scale: 0}} animate={{scale: 1}} className={`modalsiandpinchloandhigh p-2 fixed top-0 left-0 w-full h-full backdrop-blur-md z-[1000000000000000000] ${ads}`}>
+                    <ATJ isprev={true} />
+                  </motion.div>
+                </AnimatePresence>
+                : ''
             }
           </>
       }

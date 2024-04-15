@@ -29,7 +29,7 @@ let PVu = () => {
     };
     // 
     return (
-        <div className="iframecontainer relative w-full h-full">
+        <div className=" fixed top-0 left-0 w-full h-full z-[100000000000000000]">
             <div className="closebtinasdf flex items-center justify-end gap-1 absolute top-[5px] right-[5px] z-[100000000]">
                 <button disabled={d} onClick={d ? e => { } : download} className="saveBTn transition-all opacity-[.4] hover:opacity-[1] flex items-center justify-center h-full rounded-xl brd hover:shadow-xl cursor-pointer btn gap-1 uppercase">
                     {
@@ -50,7 +50,7 @@ let PVu = () => {
                     pvT ?
                         pvT.includes('image') ?
                             <div className="conTains flex items-center justify-center w-full h-full">
-                                <img src={pvT.split('+')[0]} className=' w-full h-full object-contain' />
+                                <Img id={pvT.split('+')[2]} isDEF={true} src={pvT.split('+')[0]} className=' w-full h-full object-contain' />
                             </div>
                             :
                             <iframe sandbox='allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-top-navigation allow-pointer-lock' src={pvT.split('+')[0]} className=' w-full h-full absolute top-0 z-[1]' /> : `NOTHING FOUND`

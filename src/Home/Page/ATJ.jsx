@@ -10,7 +10,7 @@ let ATJ = ({ val, setprev, isprev }) => {
           <>
             <PVu/>
           </> : 
-          <div className="aidnkikeaidfviewsnow flex items-center justify-between flex-col fixed top-0 left-0 w-full h-full z-[10000000000000] bg-[var(--basebg)] backdrop-blur-md">
+          <div className="aidnkikeaidfviewsnow flex items-center justify-between flex-col fixed top-0 left-0 w-full h-full z-[10000000000000000] bg-[var(--basebg)] backdrop-blur-md">
           <div className="modalsnaidviews w-full flex items-center justify-between gap-2 p-1 brd bg-[var(--basebg)]">
             <div className="ipaddresshere">
               Attack Info
@@ -19,7 +19,7 @@ let ATJ = ({ val, setprev, isprev }) => {
               <div className="bi bi-x-lg h-10 w-10 flex items-center justify-center bg-[var(--mainBg)] brd cursor-pointer" />
             </div>
           </div>
-           <div className="jsoncontainersasd overflow-auto h-full w-full">
+           <div className="jsoncontainersasd overflow-auto h-full w-full z-[100000000000]">
            <JsonView data={val} shouldExpandNode={allExpanded} style={defaultStyles} />
            </div>
           </div>

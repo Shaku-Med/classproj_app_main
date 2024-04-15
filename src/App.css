@@ -3,6 +3,7 @@
     --mainCl: #ededed;
     --basebg: #42404044;
     --border: #66666649;
+    --deep: #424040;
     /* --basebg1: #42404019; */
     color-scheme: dark;
 }
@@ -26,6 +27,7 @@ body {
         --mainCl: #000;
         --basebg: #ffffffb4;
         --border: #88888815;
+        --deep: #ffffff;
         color-scheme: light;
     }
 }
@@ -62,6 +64,12 @@ img {
     gap: 5px;
 }
 
+.gridStocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 5px;
+}
+
 .dianakestream {
     flex: 1 1 20rem;
     height: 400px;
@@ -80,6 +88,15 @@ img {
     }
     .stdadinad {
         grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+    .gridStocks {
+        grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .gridStocks {
+        grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
     }
 }
 
@@ -187,4 +204,20 @@ ul:hover::-webkit-scrollbar {
     0% {
         filter: brightness(300%);
     }
+}
+
+.gridPotte {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 2px;
+}
+
+.untopcontainer:hover .messtimes {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.messtimes {
+    opacity: 1;
+    transition: all .3s ease-in-out;
 }
