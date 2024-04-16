@@ -10,7 +10,10 @@ import myK from './getK';
 import Errors from './Alert/Errors';
 import axios from 'axios'
 import Obj from './Obj';
+import dotenv from 'dotenv';
 
+dotenv.config();
+// 
 let callBack = (k, root) => {
   // 
   if (!localStorage.getItem('id')) {
