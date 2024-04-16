@@ -1,7 +1,6 @@
 import React from 'react'
 import getDev from './getDev'
 // import * as dotenv from 'dotenv'
-require('dotenv').config()
 
 let myK = () => {
   try {
