@@ -8,11 +8,6 @@ const urlsToCache = [
     'https://chatzy-silk.vercel.app/'
 ];
 
-let ch = localStorage.getItem('cache')
-if (ch) {
-    urlsToCache.concat(ch);
-}
-
 self.addEventListener('install', event => {
     event.waitUntil(
         Promise.all(
