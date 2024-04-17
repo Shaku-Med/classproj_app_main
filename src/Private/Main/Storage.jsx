@@ -185,80 +185,93 @@ let Storage = () => {
             let files = isfile ? e.target.files : e.dataTransfer.files
             if (files) {
                 toast.info('upload in progress, Do not reload this page till done.')
+                let fileStack = []
                 for (let i = 0; i < files.length; i++) {
-                    let uid = uuid().split('-').join('').toUpperCase();
+                    fileStack.push(i)
+                }
+                // 
+                if (fileStack.length > 0) {
+                    let sendF = (i) => {
+                        if (i <= fileStack.length - 1) {
+                            let uid = uuid().split('-').join('').toUpperCase();
                     
-                    let r = new FileReader()
-                    r.onload = (e) => {
+                            let r = new FileReader()
+                            r.onload = (e) => {
 
                         
-                        //
-                        const b = new Uint8Array(r.result);
-                        // 
-                        let bl = new Blob([b], { type: files[i].type })
-                        let blob = URL.createObjectURL(bl)
+                                //
+                                const b = new Uint8Array(r.result);
+                                // 
+                                let bl = new Blob([b], { type: files[i].type })
+                                let blob = URL.createObjectURL(bl)
 
-                        const chunkSize = 200 * 1024; // 3MB
-                        const chunks = [];
+                                const chunkSize = 200 * 1024; // 3MB
+                                const chunks = [];
                 
-                        for (let offset = 0; offset < b.byteLength; offset += chunkSize) {
-                            chunks.push(b.slice(offset, offset + chunkSize));
-                        }
+                                for (let offset = 0; offset < b.byteLength; offset += chunkSize) {
+                                    chunks.push(b.slice(offset, offset + chunkSize));
+                                }
 
                     
-                        let FLB = async (ob) => {
-                            try {
-                                let fl = {
-                                    userid: owner[0].id,
-                                    upT: new Date().toDateString().split(/\s/).join('_'),
-                                    ky: ob,
-                                    file: JSON.stringify(chunks[ob]),
-                                    id: uid,
-                                    tyy: files[i].type,
-                                    name: files[i].name
-                                }
-                                if (ob <= chunks.length - 1) {
-                                    let x = await AddProfile(fl)
-                                    if (x) {
-                                        FLB(ob + 1)
+                                let FLB = async (ob) => {
+                                    try {
+                                        let fl = {
+                                            userid: owner[0].id,
+                                            upT: new Date().toDateString().split(/\s/).join('_'),
+                                            ky: ob,
+                                            file: JSON.stringify(chunks[ob]),
+                                            id: uid,
+                                            tyy: files[i].type,
+                                            name: files[i].name
+                                        }
+                                        if (ob <= chunks.length - 1) {
+                                            let x = await AddProfile(fl)
+                                            if (x) {
+                                                FLB(ob + 1)
+                                            }
+                                            else {
+                                                toast.info(`Upload cancelled / Re Uploading`)
+                                                FLB(ob)
+                                            }
+                                        }
+                                        else {
+                                            handleUp(fl, chunks, blob)
+                                            // 
+                                            sendF(i + 1);
+                                            // 
+                                            if (i === files.length - 1) {
+                                                toast.success(`Upload completed. No need to reload, everything has automatically being updated.`)
+                                                // 
+                                                setloading([])
+                                                if (inputref.current) {
+                                                    inputref.current.value = ''
+                                                }
+                                            }
+                                        }
                                     }
-                                    else {
-                                        toast.info(`Upload cancelled / Re Uploading`)
+                                    catch (er) {
                                         FLB(ob)
                                     }
                                 }
-                                else {
-                                    handleUp(fl, chunks, blob)
+
+                                if (chunks.length > 0 && owner.length > 0) {
+                                    handleUp({ id: uid, tyy: files[i].type, name: files[i].name }, chunks, blob, true);
                                     // 
-                                    if (i === files.length - 1) {
-                                        toast.success(`Upload completed. No need to reload, everything has automatically being updated.`)
-                                        // 
-                                        setloading([])
-                                        if (inputref.current) {
-                                            inputref.current.value = ''
-                                        }
-                                    }
+                                    FLB(0)
+                                }
+                                else {
+                                    toast.error(`Unable to chop your file.`)
                                 }
                             }
-                            catch (er) {
-                                FLB(ob)
-                            }
-                        }
-
-                        if (chunks.length > 0 && owner.length > 0) {
-                            handleUp({ id: uid, tyy: files[i].type, name: files[i].name }, chunks, blob, true);
-                            // 
-                            setTimeout(() => {
-                                FLB(0)
-                            }, i * 2000);
+                            r.readAsArrayBuffer(files[i])
                         }
                         else {
-                            toast.error(`Unable to chop your file.`)
+                            toast.success(`Upload complete, your files have been saved.`)
                         }
                     }
-                    r.readAsArrayBuffer(files[i])
+
+                    sendF(0)
                 }
-                // 
             }
         }
         catch { }
