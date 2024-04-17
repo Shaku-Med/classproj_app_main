@@ -3,9 +3,6 @@ const urlsToCache = [
     '/',
     '/favicon.ico',
     '/tempo.mp3',
-    'https://clpb.onrender.com/',
-    'https://raw.githubusercontent.com/',
-    'https://chatzy-silk.vercel.app/'
 ];
 
 self.addEventListener('install', event => {
