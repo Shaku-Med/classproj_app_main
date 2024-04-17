@@ -46,7 +46,7 @@ let Chatbox = () => {
       }
       {
         progress ?
-          <div className="conTTime min-h-[5px] w-full bg-[var(--basebg)]">
+          <div className="conTTime z-[100000000000000] min-h-[5px] w-full bg-[var(--basebg)] pointer-events-none">
             <div style={{ width: `${progress}%` }} className="pbar h-full w-0 bg-danger transition-all" />
           </div> : ``
       }
