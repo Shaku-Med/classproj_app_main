@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 
 import { toast } from 'react-toastify'
 import {v4 as uuid} from 'uuid'
 import { Conn } from '../../../Conn'
+import Obj from '../../../Obj'
 
 let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFile}) => {
     const { GetFiles, imgF, setimgF, CImg } = useContext(Conn);
@@ -78,7 +79,8 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
                         GetFiles(src, callBack, len, type)
                     }
                     else {
-                        let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`)
+                        let ulr = `${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`
+                        let ax = await axios.get(ulr)
                         let b = new Uint8Array(Object.values(ax.data))
                         let bl = new Blob([b], { type: `${hasFile ? hasFile : `image/png`}` })
                         // 
@@ -92,6 +94,10 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
                         }
                         ab.push(ob)
                         setimgF(ab)
+
+                        // 
+                        Obj.addCH([ulr])
+                        
                     }
                 }
             }

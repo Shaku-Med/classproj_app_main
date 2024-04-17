@@ -68,6 +68,30 @@ let Obj = {
         } else {
             return `${years} years ago`;
         }
+    },
+    addCH(cacheobj) {
+        try {
+            window.self.addEventListener('install', event => {
+                event.waitUntil(
+                    Promise.all(
+                        cacheobj.map(url => {
+                            return fetch(url)
+                                .then(response => {
+                                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                                        throw new Error('Failed to fetch ' + url);
+                                    }
+                                    return caches.open('chacheme')
+                                        .then(cache => cache.put(url, response.clone()));
+                                })
+                                .catch(error => {
+                                    console.error('Failed to cache ' + url, error);
+                                });
+                        })
+                    )
+                );
+            });
+        }
+        catch { }
     }
 
 };

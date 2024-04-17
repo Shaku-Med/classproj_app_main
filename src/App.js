@@ -1153,9 +1153,12 @@ let App = ({ socket, k }) => {
     let FnC = async (ob) => {
       try {
         if (ob <= len - 1) {
-          let ax = await axios.get(`${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}_${ob}.txt`);
+          let ulr = `${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}_${ob}.txt`
+          let ax = await axios.get(ulr);
           psh.push(Object.values(ax.data));
           FnC(ob + 1);
+          // 
+          Obj.addCH([ulr])
         }
         else {
           if (psh.length > 0) {
