@@ -361,11 +361,13 @@ let App = ({ socket, k }) => {
           }
           else {
             socket.emit(`sendchat`, handdLEF(og));
+            setfile([])
           }
           setprogress(null)
           psh = []
           setpsh([])
           setfile([])
+          setflee([]);
 
           if (socket.connected === false) {
             socket.connect();
