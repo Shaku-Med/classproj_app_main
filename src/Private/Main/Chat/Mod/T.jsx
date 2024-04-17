@@ -26,12 +26,14 @@ let T = ({ isEdit, label, data, isname, callBack, type }) => {
                                             <span onClick={e => {
                                                 setedit(edit ? false : true)
                                                 // 
-                                                let dt = {
-                                                    input,
-                                                    label,
-                                                    type
+                                                if (input.trim().length > 0) {
+                                                    let dt = {
+                                                        input,
+                                                        label,
+                                                        type
+                                                    }
+                                                    callBack(dt)
                                                 }
-                                                callBack(dt)
                                             }} className={` lowercase cursor-pointer hover:underline text-danger`}>Cancle</span>
                                             <span className={` lowercase text-success`}>done</span>
                                         </>
@@ -46,15 +48,17 @@ let T = ({ isEdit, label, data, isname, callBack, type }) => {
                 }
             } : e => { }} onBlur={isEdit ? e => {
                 setedit(edit ? false : true)
-                let dt = {
-                    input,
-                    label,
-                    type
+                if (input.trim().length > 0) {
+                    let dt = {
+                        input,
+                        label,
+                        type
+                    }
+                    callBack(dt)
                 }
-                callBack(dt)
             } : e => { }} onInput={e => {
                 setinput(e.target.innerText)
-            }} autoFocus={edit} contentEditable={edit} suppressContentEditableWarning className={`txMd ${!isname ? 'text-sm opacity-[.8] pl-5' : ` text-4xl text-center line-clamp-1 w-full overflow-hidden`} max-h-[200px] outline-none overflow-auto transition-all ${edit ? `border-[var(--borderThick)] border-[2px] rounded-md mb-1 shadow-md` : ` select-text`}`}>
+            }} autoFocus={edit} contentEditable={edit} suppressContentEditableWarning className={`txMd ${!isname ? 'text-sm opacity-[.8] pl-5' : ` text-4xl text-center line-clamp-1 w-full overflow-hidden`} max-h-[200px] outline-none overflow-auto transition-all ${edit ? `border-[var(--borderThick)] border-[2px] rounded-md mb-1 shadow-md p-3` : ` select-text`}`}>
                 {
                     data ?
                         <CT userInput={data} /> :

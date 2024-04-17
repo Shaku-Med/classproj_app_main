@@ -9,6 +9,7 @@ import {v4 as uuid} from 'uuid'
 import Img from '../../Chatbox/Container/Chatb/Img';
 import PicPiv from './Chat/Mod/Prevpic';
 import { motion } from 'framer-motion'
+import {enc, dec} from 'medto'
 
 // 
 let Storage = () => {
@@ -106,13 +107,15 @@ let Storage = () => {
                 exp: date.setSeconds(date.getSeconds() + 10),
             };
             // https://clpb.onrender.com
-            let ax = await axios.post(`https://clpb.onrender.com`, {
-                Authorization: Obj.encDec(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
-                isAuth: localStorage.getItem('userid'),
+            let ax = await axios.post(`https://chatzy-silk.vercel.app`, {
+                // Authorization: Obj.encDec(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
+                // isAuth: localStorage.getItem('userid'),
                 ...fl
             }, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': enc(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
+                    'isAuth': localStorage.getItem('userid') ? true : false
                 },
                 onUploadProgress: e => {
                     const { loaded, total } = e;
@@ -195,7 +198,7 @@ let Storage = () => {
                         let bl = new Blob([b], { type: files[i].type })
                         let blob = URL.createObjectURL(bl)
 
-                        const chunkSize = 2 * 1024 * 1024; // 3MB
+                        const chunkSize = 200 * 1024; // 3MB
                         const chunks = [];
                 
                         for (let offset = 0; offset < b.byteLength; offset += chunkSize) {

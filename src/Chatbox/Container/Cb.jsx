@@ -177,16 +177,6 @@ function Cb({msga}) {
                 )
               })
             }
-
-            {
-              pvT !== null ?
-                <AnimatePresence>
-                  <motion.div initial={{scale: 0}} animate={{scale: 1}} className={`modalsiandpinchloandhigh p-2 fixed top-0 left-0 w-full h-full backdrop-blur-md z-[1000000000000000000] ${ads}`}>
-                    <ATJ isprev={true} />
-                  </motion.div>
-                </AnimatePresence>
-                : ''
-            }
           </>
       }
       <div className="bottomM p-2" />

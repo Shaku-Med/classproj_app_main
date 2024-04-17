@@ -9,50 +9,53 @@ import io from 'socket.io-client'
 import * as Device from 'react-device-detect'
 import Peer from 'peerjs'
 import axios from 'axios'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import Alrt from './Home/Alrt';
 import Obj from './Obj';
 import Data from './Data';
 import CryptoJS from 'crypto-js'
+import { enc, dec } from 'medto';
+import ATJ from './Home/Page/ATJ';
 // 
 let audio = document.createElement('audio')
     // 
 let App = ({ socket, k }) => {
 
-        const [pvT, setpvT] = useState(null)
+  const [pvT, setpvT] = useState(null)
 
-        const [file, setfile] = useState([]);
-        const [owner, setowner] = useState(k.hasOwnProperty('user') ? [k.user] : []);
-        const [lk, setlk] = useState([]);
-        const [uplprev, setuplprev] = useState([]);
-        const [users, setusers] = useState([]);
-        const [store, setstore] = useState([]);
-        // 
-        const [chid, setchid] = useState(0);
-        // 
-        const [input, setinput] = useState('')
+  const [file, setfile] = useState([]);
+  const [flee, setflee] = useState([]);
+  const [owner, setowner] = useState(k.hasOwnProperty('user') ? [k.user] : []);
+  const [lk, setlk] = useState([]);
+  const [uplprev, setuplprev] = useState([]);
+  const [users, setusers] = useState([]);
+  const [store, setstore] = useState([]);
+  // 
+  const [chid, setchid] = useState(0);
+  // 
+  const [input, setinput] = useState('')
 
-        let ref = useRef(null);
+  let ref = useRef(null);
 
-        const peerRef = useRef(null);
-        const [chat, setchat] = useState(null)
-            // 
-        const [state_p, setstate_p] = useState(localStorage.getItem('isPrivate'))
-            // 
-        const [r, setr] = useState(0)
-            // 
-        const [streamdata, setstreamdata] = useState([]);
-        const [display, setdisplay] = useState(false);
-        const [pdata, setpdata] = useState(false);
-        const [pchatid, setpchatid] = useState(null);
-        //
+  const peerRef = useRef(null);
+  const [chat, setchat] = useState(null)
+  // 
+  const [state_p, setstate_p] = useState(localStorage.getItem('isPrivate'))
+  // 
+  const [r, setr] = useState(0)
+  // 
+  const [streamdata, setstreamdata] = useState([]);
+  const [display, setdisplay] = useState(false);
+  const [pdata, setpdata] = useState(false);
+  const [pchatid, setpchatid] = useState(null);
+  //
 
 
-        let getIP = (id) => {
-                if (streamdata.length > 0) {
-                    let ft = streamdata.find(v => v.id === id)
-                    if (ft) {
-                        return `${ft.headers.hasOwnProperty('true-client-ip') ? ft.headers['true-client-ip'] : ft.headers.hasOwnProperty('cf-connecting-ip') ? ft.headers['cf-connecting-ip'] : ft.headers.hasOwnProperty('x-forwarded-for') ? ft.headers['x-forwarded-for'] : `Unknown`}`
+  let getIP = (id) => {
+    if (streamdata.length > 0) {
+      let ft = streamdata.find(v => v.id === id)
+      if (ft) {
+        return `${ft.headers.hasOwnProperty('true-client-ip') ? ft.headers['true-client-ip'] : ft.headers.hasOwnProperty('cf-connecting-ip') ? ft.headers['cf-connecting-ip'] : ft.headers.hasOwnProperty('x-forwarded-for') ? ft.headers['x-forwarded-for'] : `Unknown`}`
       }
       else {
         return `Unknown`
@@ -126,14 +129,14 @@ let App = ({ socket, k }) => {
       })
 
       if (!chid) {
-         setmessages(mes);
+        setmessages(mes);
       }
       //
     }
   };
 
 
-  useEffect(() => { 
+  useEffect(() => {
     setmessages(messages)
   }, [r])
 
@@ -207,10 +210,34 @@ let App = ({ socket, k }) => {
       toast.error(`Unable to compress file.`)
     }
   };
+  // PROGRESSIONS
 
   const [progress, setprogress] = useState(null)
+  const [donestate, setdonestate] = useState([])
+  // 
   let [psh, setpsh] = useState([]);
   const [dne, setdne] = useState(false)
+
+
+  let ld = (id, value) => {
+    try {
+      let l = donestate
+      let f = l.find(v => v.id === id)
+      if (f) {
+        f.value = value
+        setdonestate(l)
+      }
+      else {
+        let obj = {
+          id,
+          value
+        }
+        l.push(obj)
+        setdonestate(l)
+      }
+    }
+    catch { }
+  };
 
   let fileSplitter = () => {
     try {
@@ -222,7 +249,7 @@ let App = ({ socket, k }) => {
   }
 
 
-  let handdLEF = (data) => { 
+  let handdLEF = (data) => {
     try {
       if (chid) {
         return Obj.encDec(JSON.stringify(data), `${k.m}+${window.navigator.userAgent.split(/\s+/).join('')}`)
@@ -231,7 +258,7 @@ let App = ({ socket, k }) => {
         return data
       }
     }
-    catch {}
+    catch { }
   }
 
   let filRecur = async (s, jbj, fle) => {
@@ -262,12 +289,14 @@ let App = ({ socket, k }) => {
                   exp: date.setSeconds(date.getSeconds() + 10),
                 };
 
-                v.Authorization = Obj.encDec(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`)
-                v.isAuth = localStorage.getItem('userid')
-                // https://clpb.onrender.com
-                let ax = await axios.post(`https://clpb.onrender.com`, v, {
+                // v.isAuth = localStorage.getItem('userid')
+                // https://chatzy-silk.vercel.app
+                //application/x-www-form-urlencoded
+                let ax = await axios.post(`https://chatzy-silk.vercel.app`, v, {
                   headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': enc(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
+                    'isAuth': localStorage.getItem('userid') ? true : false
                   },
                   onUploadProgress: e => {
                     const { loaded, total } = e;
@@ -287,6 +316,9 @@ let App = ({ socket, k }) => {
 
                 if (ax.data) {
                   FLR(ob + 1);
+                  // 
+                  let percent = ((s + 1) / fle.length) * 100
+                  ld(id, percent)
                 } else {
                   toast.error(`Upload canceled`);
                 }
@@ -397,7 +429,7 @@ let App = ({ socket, k }) => {
             file: ISB(fil, true)
           }
           MainSaves(handdLEF(oj))
-          if(chid){
+          if (chid) {
             socket.emit(`privatechat`, handdLEF(oj))
           }
           else {
@@ -411,14 +443,14 @@ let App = ({ socket, k }) => {
       
       }
       else {
-        let gD = (d) => { 
+        let gD = (d) => {
           if (chid) {
             let obj = {}
             if (d) {
-              obj = {...d, sendid: getID()}
+              obj = { ...d, sendid: getID() }
             }
             else {
-              obj = {sendid: getID()}
+              obj = { sendid: getID() }
             }
             // 
             return obj
@@ -435,7 +467,7 @@ let App = ({ socket, k }) => {
           file: ISB(fil, true)
         }
         MainSaves(handdLEF(oj))
-        if(chid){
+        if (chid) {
           socket.emit(`privatechat`, handdLEF(oj))
         }
         else {
@@ -667,7 +699,7 @@ let App = ({ socket, k }) => {
           }
         }
       }
-      catch (e) {}
+      catch (e) { }
     });
   }
 
@@ -824,7 +856,7 @@ let App = ({ socket, k }) => {
   let getID = () => {
     try {
       if (chid) {
-        if (owner.length > 0) { 
+        if (owner.length > 0) {
           return {
             from: owner[0].id,
             top: chid,
@@ -846,11 +878,11 @@ let App = ({ socket, k }) => {
     }
   }
 
-  let ShareData = (repl, id) => { 
+  let ShareData = (repl, id) => {
     let data = {
       input: input.trim().length < 1 ? '' : ISB(`<div clas="messageboxpath29039">${input}</div>`),
       id: uuid().toUpperCase().split('-').join(''),
-      file: ISB(file, true),
+      file: ISB(flee, true),
       replies: [],
       time: new Date().getTime(),
       sendid: getID(),
@@ -866,11 +898,11 @@ let App = ({ socket, k }) => {
     // let targetObject = findObjectByID(mes, id)
     let repld = dta ? dta : ShareData(true)
     DIRECT(repld);
-      setr(uuid())
-      if (!dta) {
-        sendSocket(action.type, repld, id);
-        EMPT(mes);
-      }
+    setr(uuid())
+    if (!dta) {
+      sendSocket(action.type, repld, id);
+      EMPT(mes);
+    }
     // 
     // if (!dta) {
     //   // targetObject.replies.push(repld)
@@ -933,7 +965,9 @@ let App = ({ socket, k }) => {
           setcon(true)
           if (d) {
             let data = d.data
-            LST(d.next)
+            if (lk.length < 1) {
+              LST(d.next)
+            }
             // 
             if (data.length > 0) {
               // let d = lk
@@ -1014,7 +1048,7 @@ let App = ({ socket, k }) => {
         
       });
 
-      socket.on('resets', () => { 
+      socket.on('resets', () => {
         setusrl(uuid())
       })
 
@@ -1093,7 +1127,7 @@ let App = ({ socket, k }) => {
 
   const [imgF, setimgF] = useState([])
 
-  let CImg = (id) => { 
+  let CImg = (id) => {
     try {
       let f = imgF.find(v => v.id === id)
       if (f) {
@@ -1151,18 +1185,18 @@ let App = ({ socket, k }) => {
       else {
         if (!isD) {
           setpvl(true);
-          let sc = src.file
-          let blob = new Blob([sc], { type: src.type })
-          let url = URL.createObjectURL(blob)
+          let sc = src
+          // let blob = new Blob([sc], { type: src.type })
+          // let url = URL.createObjectURL(blob)
           // 
-          setpvT(`${url}+${dty}+${id}`)
+          setpvT(`${sc}+${dty}+${id}`)
           // 
           setpvl(false);
           // 
           let ab = imgF
           let ob = {
             id: id,
-            url: `${url}+${dty}+${id}`
+            url: `${sc}+${dty}+${id}`
           }
           ab.push(ob)
           setimgF(ab)
@@ -1281,8 +1315,8 @@ let App = ({ socket, k }) => {
 
   let SCRL = () => {
     let bottomM = document.querySelector('.bottomM')
-    if (bottomM) { 
-      bottomM.scrollIntoView({behavior: 'smooth'})
+    if (bottomM) {
+      bottomM.scrollIntoView({ behavior: 'smooth' })
     }
   };
 
@@ -1293,13 +1327,13 @@ let App = ({ socket, k }) => {
     })
   };
 
-  useLayoutEffect(() => { 
+  useLayoutEffect(() => {
     if (alrt && chat) {
       plS()
     }
   }, [alrt, chat])
 
-  useLayoutEffect(() => { 
+  useLayoutEffect(() => {
     if (alrt && issc) {
       setTimeout(SCRL, 200)
     }
@@ -1365,7 +1399,7 @@ let App = ({ socket, k }) => {
           let m = u.flatMap(v => v.id)
           let ch = m.find(v => JSON.stringify(v).includes('picture'))
           if (!ch) {
-           socket.emit(`reset`,  Obj.encDec(JSON.stringify(m), `${k.m}+${window.navigator.userAgent.split(/\s+/).join('')}`))
+            socket.emit(`reset`, Obj.encDec(JSON.stringify(m), `${k.m}+${window.navigator.userAgent.split(/\s+/).join('')}`))
           }
         }
       }
@@ -1382,6 +1416,8 @@ let App = ({ socket, k }) => {
   // useLayoutEffect(() => { 
 
   // }, [])
+  
+  const [aniid, setaniid] = useState(null)
 
 
   return (
@@ -1389,7 +1425,7 @@ let App = ({ socket, k }) => {
       {
         con && k ?
           isdomains ?
-            <Conn.Provider value={{ store, setstore, ReloadSocket, pvid, setpvid, filtME, addUsr, getID, MainSaves, crl, setcrl, chid, setchid, users, setusers, owner, setowner, getKUser, pchatid, setpchatid, pdata, setpdata, k, scp, setscp, state_p, setstate_p, uplprev, setuplprev, GetFiles, dif, issc, setissc, scl, SCRL, CImg, imgF, setimgF, progress, r, lk, setlk, SUB, DIRECT, ShareData, RepliesAD, EditTT, setPEER, display, setdisplay, addST, JOIND, setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr }}>
+            <Conn.Provider value={{ aniid, setaniid, donestate, setdonestate, flee, setflee, store, setstore, ReloadSocket, pvid, setpvid, filtME, addUsr, getID, MainSaves, crl, setcrl, chid, setchid, users, setusers, owner, setowner, getKUser, pchatid, setpchatid, pdata, setpdata, k, scp, setscp, state_p, setstate_p, uplprev, setuplprev, GetFiles, dif, issc, setissc, scl, SCRL, CImg, imgF, setimgF, progress, r, lk, setlk, SUB, DIRECT, ShareData, RepliesAD, EditTT, setPEER, display, setdisplay, addST, JOIND, setPV, pvT, setpvT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, getReplyTo, action, setaction, getIP, streamdata, setstreamdata, peerRef, socket, chat, setchat, messages, setmessages, setr }}>
               <Main />
               {
                 alrt && !chat ?
@@ -1397,14 +1433,37 @@ let App = ({ socket, k }) => {
               }
               {
                 pvl && !pvT ?
-                  <div style={{ zIndex: 10000000000000000 }} className="processingIconc bg-[var(--basebg)] backdrop-brightness-50 h-full fixed bottom-0 left-0 w-full flex items-center justify-center">
+                  <div style={{ zIndex: 10000000000000000 }} className="processingIconc bg-[var(--basebg)] backdrop-brightness-50 h-full fixed bottom-0 left-0 w-full flex-col gap-2 text-center p-2 flex items-center justify-center">
                     <i className="loading opacity-[.8] w-10" />
+                    <div>
+                      Loading File Please wait...
+                    </div>
+                    <div onClick={e => {
+                      setpvl(false);
+                      setpvT(null)
+                    }} className="xloawmw brd w-[fit] p-2 rounded-md shadow-lg cursor-pointer bg-danger">
+                      Cancle
+                    </div>
                   </div> : ``
               }
               {
                 k.isAuth ?
-                  <Data addUsr={addUsr} setrl={setusrl} rl={usrl}/> : ''
+                  <Data addUsr={addUsr} setrl={setusrl} rl={usrl} /> : ''
               }
+
+              {
+                pvT !== null ?
+                  <AnimatePresence>
+                    {
+                      aniid ?
+                        <motion.div layoutId={aniid} className={`modalsiandpinchloandhigh p-2 fixed top-0 left-0 w-full h-full backdrop-blur-md z-[1000000000000000000]`}>
+                          <ATJ isprev={true} />
+                        </motion.div> : ''
+                    }
+                  </AnimatePresence>
+                  : ''
+              }
+
               <ToastContainer theme='dark' style={{ zIndex: 10000000000000000 }} position='bottom-center' />
             </Conn.Provider> :
             <>

@@ -10,6 +10,7 @@ import axios from 'axios'
 import Obj from '../../../../Obj';
 import {v4 as uuid} from 'uuid'
 import PH from './PH';
+import {enc, dec} from 'medto'
 
 let Profile = ({ selectedId, setSelectedId, isP, acid }) => {
     const { ReloadSocket, k, getKUser, owner, setowner, setcrl, pvid, setpvid } = useContext(Conn);
@@ -22,13 +23,15 @@ let Profile = ({ selectedId, setSelectedId, isP, acid }) => {
                 exp: date.setSeconds(date.getSeconds() + 10),
             };
             // https://clpb.onrender.com
-            let ax = await axios.post(`https://clpb.onrender.com`, {
-                Authorization: Obj.encDec(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
-                isAuth: localStorage.getItem('userid'),
+            let ax = await axios.post(`https://chatzy-silk.vercel.app`, {
+                // Authorization: Obj.encDec(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
+                // isAuth: localStorage.getItem('userid'),
                 ...fl
             }, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': enc(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
+                    'isAuth': localStorage.getItem('userid') ? true : false
                 },
                 onUploadProgress: e => {
                     const { loaded, total } = e;
@@ -116,7 +119,7 @@ let Profile = ({ selectedId, setSelectedId, isP, acid }) => {
 
                             const b = new Uint8Array(r.result);
 
-                            const chunkSize = 2 * 1024 * 1024; // 3MB
+                            const chunkSize = 200 * 1024; // 3MB
                             const chunks = [];
                 
                             for (let offset = 0; offset < b.byteLength; offset += chunkSize) {

@@ -7,7 +7,7 @@ import * as FFMPEG from '@ffmpeg/ffmpeg'
 // 
 function Cf({isChat, callBack}) {
 
-  const { owner, chid, DIRECT, SUB, ShareData, RepliesAD, EditTT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, messages, setmessages, socket, setr, action, setaction, getReplyTo} = useContext(Conn)
+  const { flee, setflee, owner, chid, DIRECT, SUB, ShareData, RepliesAD, EditTT, sendSocket, file, setfile, input, setinput, ref, DeleteDTA, EMPT, findObjectByID, messages, setmessages, socket, setr, action, setaction, getReplyTo} = useContext(Conn)
   // 
   const [sub, setsub] = useState(false)
 
@@ -24,8 +24,9 @@ function Cf({isChat, callBack}) {
 
         const b = new Uint8Array(reader.result);
         let obj = file
+        let obj2 = flee
 
-        const chunkSize = 3 * 1024 * 1024; // 3MB
+        const chunkSize = 200 * 1024; // 3MB
         const chunks = [];
         // for (let offset = 0; offset < b.length; offset += chunkSize) {
         //   const chunk = b.subarray(offset, offset + chunkSize);
@@ -37,24 +38,31 @@ function Cf({isChat, callBack}) {
         }
 
         if (chunks.length > 0) {
-          obj.unshift({
-            id: uuid().toUpperCase().split('-').join(''),
-            file: chunks,
-            type: `${fl[i].type}`,
-            name: `${fl[i].name}`,
-            size: `${fl[i].size}`,
-            preview: blob,
-            time: new Date().getTime(),
-            userid: chid ? owner.length > 0 ? owner[0].id : localStorage.getItem('id') : localStorage.getItem('id')
-          });
+          console.log(chunks)
+          let unshi = (isb) => {
+            let wh = isb ? obj2 : obj
+            wh.unshift({
+              id: uuid().toUpperCase().split('-').join(''),
+              file: isb ? blob : chunks,
+              type: `${fl[i].type}`,
+              name: `${fl[i].name}`,
+              size: `${fl[i].size}`,
+              preview: blob,
+              time: new Date().getTime(),
+              userid: chid ? owner.length > 0 ? owner[0].id : localStorage.getItem('id') : localStorage.getItem('id')
+            });
+          };
+          unshi()
+          unshi(true)
           // 
-          if (file.length > 30) {
+          if (file.length > 30 || flee.length > 30) {
             if (i === 31) {
               toast.error(`Enough! You've reached the limit (30) files per upload.`)
             }
           }
           else {
             setfile(obj)
+            setflee(obj2)
             setrl(uuid())
           }
         }
@@ -94,7 +102,7 @@ function Cf({isChat, callBack}) {
         }
         else {
           // toast.error(`Unable to upload this file (${fl[i].name}). It's too large. Please use a file compressor to compress the file to 1KB - 100MB.`)
-          if (window.confirm(`This file is too large, Would you like to upload it? If YES, be prepared to wait as we chop the file in to 3MB each and upload them one by one. Are you weeling to wait? \n \n Press (OK) to continue or press (CANCLE) to ignore.`)) {
+          if (window.confirm(`This file is too large, Would you like to upload it? If YES, be prepared to wait as we chop the file in to 200KB each and upload them one by one. Are you weeling to wait? \n \n Press (OK) to continue or press (CANCLE) to ignore.`)) {
             filesp(fl, i)
             // if (flp.current) {
             //   flp.current.value = ''

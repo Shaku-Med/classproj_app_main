@@ -8,7 +8,7 @@ import CryptoJS from 'crypto-js';
 import Obj from '../../../Obj';
 // 
 function Chatb({ val, isrepl, RPLS}) {
-    const { filtME, k, chid, getIP, action, setaction, DeleteDTA, sendSocket, messages, users, owner} = useContext(Conn);
+    const { donestate, setdonestate, filtME, k, chid, getIP, action, setaction, DeleteDTA, sendSocket, messages, users, owner} = useContext(Conn);
 
     const [repl, setrepl] = useState(false)
     const [dt, setdt] = useState([])
@@ -168,9 +168,20 @@ function Chatb({ val, isrepl, RPLS}) {
                                     v.file.length < 1 ? '' :
                                         <div className="innermessageboobles overflow-auto relative w-full text-[13px] bg-[var(--basebg)] p-1 rounded-md brd mt-1">
                                             <CFILE filtME={filtME} val={v} />
-                                            <div className="loaderState absolute bottom-0 left-0 z-20 h-[5px] min-h-[5px] w-full">
-                                                <div className="loadC w-full h-full bg-primary" />
-                                            </div>
+                                            <div  className="loaderState absolute bottom-0 left-0 z-20 h-[5px] min-h-[5px] w-full">
+                                                                <div className="loadC w-full h-full bg-primary" />
+                                                            </div>
+                                            {
+                                                (donestate || []).map((vk, kv) => { 
+                                                    if (vk.id === v.id) {
+                                                        return (
+                                                            <div key={kv} className="loaderState absolute bottom-0 left-0 z-20 h-[5px] min-h-[5px] w-full">
+                                                                <div style={{width: vk.value}} className="loadC w-full h-full bg-danger" />
+                                                            </div>
+                                                        );
+                                                    }
+                                                })
+                                            }
                                         </div>
                                 }
 
