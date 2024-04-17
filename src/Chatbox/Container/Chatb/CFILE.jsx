@@ -21,7 +21,8 @@ let CFILE = ({ val, filtME }) => {
                                     {
                                         v.type.includes('image') ?
                                             <div className="aidnkkkaidnkdeaser892 w-full h-full">
-                                                <Img hasFile={v.hasOwnProperty('type') ? v.type.includes('image') ? null : true : null} len={v.hasOwnProperty('fileLength') ? v.fileLength : null} id={v.id} type={v.tty} isDEF={v.hasOwnProperty('isr')} loading='lazy' src={v.hasOwnProperty('tty') ? v.file : v.file} className={` w-full object-cover object-top h-full rounded-md brd shadow-md overflow-hidden`} />
+                                                {/* v.hasOwnProperty('isr') isDEF */}
+                                                <Img hasFile={v.hasOwnProperty('type') ? v.type.includes('image') ? null : true : null} len={v.hasOwnProperty('fileLength') ? v.fileLength : null} id={v.id} type={v.tty} isDEF={true} loading='lazy' src={v.hasOwnProperty('tty') ? v.file : v.file} className={` w-full object-cover object-top h-full rounded-md brd shadow-md overflow-hidden`} />
                                             </div> :
                                             <i className={`bi bi-file-earmark text-[1.3rem]`} />
                                     }
