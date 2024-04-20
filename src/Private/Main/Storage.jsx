@@ -311,7 +311,7 @@ let Storage = () => {
                 //
                 if (reA.length > 0) {
                     let srt = reA.sort((a, b) => new Date(b.dt) - new Date(a.dt))
-                    setst(srt.reverse())
+                    setst(srt)
                 }
             }
         }
