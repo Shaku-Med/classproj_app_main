@@ -366,8 +366,6 @@ let App = ({ socket, k }) => {
           setprogress(null)
           psh = []
           setpsh([])
-          setfile([])
-          setflee([]);
 
           if (socket.connected === false) {
             socket.connect();
@@ -416,7 +414,8 @@ let App = ({ socket, k }) => {
           if (type !== 'edit') {
             let jbj = { type, data, id, inp, fil };
             filRecur(0, jbj, file)
-            setfile([])
+              setfile([])
+          setflee([]);
           }
           else {
             toast.error(`Sorry you can't edit a file.`)
