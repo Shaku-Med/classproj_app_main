@@ -38,7 +38,7 @@ function Cf({isChat, callBack}) {
         }
 
         if (chunks.length > 0) {
-          console.log(chunks)
+          // console.log(chunks)
           let unshi = (isb) => {
             let wh = isb ? obj2 : obj
             wh.unshift({
