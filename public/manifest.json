@@ -48,5 +48,6 @@
         }
     ],
     "start_url": ".",
-    "display": "standalone"
+    "display": "standalone",
+    "description": "Chatzy is a cutting-edge random chat app that connects you with people from around the world. Join us for seamless conversations and endless fun!"
 }
