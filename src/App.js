@@ -296,7 +296,7 @@ let App = ({ socket, k }) => {
                   headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': enc(JSON.stringify(abo), `${k.a}+${window.navigator.userAgent.split(/\s+/).join('')}`),
-                    'isAuth': localStorage.getItem('userid') ? true : false
+                    'isAuth': localStorage.getItem('userid') ? 'true' : 'false'
                   },
                   onUploadProgress: e => {
                     const { loaded, total } = e;
