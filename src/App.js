@@ -16,6 +16,7 @@ import Data from './Data';
 import CryptoJS from 'crypto-js'
 import { enc, dec } from 'medto';
 import ATJ from './Home/Page/ATJ';
+import getOrCreateUniqueId from './Chatbox/GetId';
 // 
 let audio = document.createElement('audio')
     // 
@@ -1128,20 +1129,25 @@ let App = ({ socket, k }) => {
 
   const [imgF, setimgF] = useState([])
 
-  let CImg = (id) => {
-    try {
-      let f = imgF.find(v => v.id === id)
-      if (f) {
-        return f.url
-      }
-      else {
-        return null
-      }
-    }
-    catch {
-      return null
-    }
-  }
+let CImg = async (id) => {
+        try {
+            let f = imgF.find(v => v.id === id)
+            if (f) {
+                return f.url
+            } else {
+                let obj = {
+                    db: `file_cache`,
+                    name: `storage`,
+                    id: id
+                };
+                let gdb = await getOrCreateUniqueId(obj, true);
+                let ul = URL.createObjectURL(gdb)
+                return `${ul}+${gdb.type ? gdb.type.includes('image') ? `image/png` : gdb.type.includes('video') || gdb.type.includes('mov') || gdb.type.includes('audio') ? `video/mp4` : gdb.type : gdb.type === '' ? `text/html` : `image/png`}+${id}`
+            }
+        } catch {
+            return null
+        }
+    };
 
 
   // GETTING FILE HERE

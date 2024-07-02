@@ -4,8 +4,9 @@ import { toast } from 'react-toastify'
 import {v4 as uuid} from 'uuid'
 import { Conn } from '../../../Conn'
 import Obj from '../../../Obj'
+import getOrCreateUniqueId from '../../GetId'
 
-let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFile}) => {
+let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFile, isrc}) => {
     const { GetFiles, imgF, setimgF, CImg } = useContext(Conn);
     // 
     const ref = useRef(null)
@@ -25,10 +26,21 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
                 let ab = imgF
                 let ob = {
                     id: id,
-                    url: `${rlu}+${hasFile ? hasFile : `image/png`}+${id}`
+                    url: `${rlu}+${hasFile ? hasFile.includes('mov') ? 'video/mp4' : isrc ? 'audio/mp3' : hasFile.includes('ogg') ? 'audio/mp3' : hasFile : `image/png`}+${id}`
                 }
                 ab.push(ob)
                 setimgF(ab)
+                // 
+                let obj = {
+                    db: `file_cache`,
+                    name: `storage`,
+                    id: id,
+                    data: {
+                        id: id,
+                        value: blob
+                    }
+                }
+                getOrCreateUniqueId(obj)
             }
         }
         catch {
@@ -52,37 +64,53 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
                 else {
                     if (len) {
                         let callBack = (psh) => {
-                            let totalSize = psh.reduce((acc, chunk) => acc + chunk.length, 0);
+                            try {
+                                let totalSize = psh.reduce((acc, chunk) => acc + chunk.length, 0);
+                                
+                                const concatenatedArrayBuffer = new Uint8Array(totalSize);
+                                let offset = 0;
+                                psh.forEach(chunk => {
+                                    concatenatedArrayBuffer.set(new Uint8Array(chunk), offset);
+                                    offset += chunk.length;
+                                });
 
-                            const concatenatedArrayBuffer = new Uint8Array(totalSize);
-                            let offset = 0;
-                            psh.forEach(chunk => {
-                                concatenatedArrayBuffer.set(new Uint8Array(chunk), offset);
-                                offset += chunk.length;
-                            });
-
-                            let b = new Uint8Array(concatenatedArrayBuffer)
-                            let bl = new Blob([b], { type: `${hasFile ? hasFile : `image/png`}` })
+                                let b = new Uint8Array(concatenatedArrayBuffer)
+                                let bl = new Blob([b], { type: `${hasFile ? hasFile.includes('mov') ? 'video/mp4' : isrc ? 'audio/mp3' : hasFile.includes('ogg') ? 'audio/mp3' : hasFile : `image/png`}` })
             
-                            let rlu = URL.createObjectURL(bl)
-                            setim(rlu);
+                                let rlu = URL.createObjectURL(bl)
+                                setim(rlu);
 
-                            let ab = imgF
-                            let ob = {
-                                id: id,
-                                url: `${rlu}+${hasFile ? hasFile : `image/png`}+${id}`
+                                let ab = imgF
+                                let ob = {
+                                    id: id,
+                                    url: `${rlu}+${hasFile ? hasFile.includes('mov') ? 'video/mp4' : isrc ? 'audio/mp3' : hasFile.includes('ogg') ? 'audio/mp3' : hasFile : `image/png`}+${id}`
+                                }
+                                ab.push(ob)
+                                setimgF(ab)
+
+                                let obj = {
+                                    db: `file_cache`,
+                                    name: `storage`,
+                                    id: id,
+                                    data: {
+                                        id: id,
+                                        value: bl
+                                    }
+                                }
+                                getOrCreateUniqueId(obj)
                             }
-                            ab.push(ob)
-                            setimgF(ab)
+                            catch (e) {
+                                console.log(e)
+                            }
                        
-                        }
+                        };
                         GetFiles(src, callBack, len, type)
                     }
                     else {
                         let ulr = `${type === 'github' ? `https://raw.githubusercontent.com/medzyamara` : ``}${src}`
                         let ax = await axios.get(ulr)
                         let b = new Uint8Array(Object.values(ax.data))
-                        let bl = new Blob([b], { type: `${hasFile ? hasFile : `image/png`}` })
+                        let bl = new Blob([b], { type: `${hasFile ? hasFile.includes('mov') ? 'video/mp4' : isrc ? 'audio/mp3' : hasFile.includes('ogg') ? 'audio/mp3' : hasFile : `image/png`}` })
                         // 
                         let rlu = URL.createObjectURL(bl)
                         setim(rlu)
@@ -90,13 +118,24 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
                         let ab = imgF
                         let ob = {
                             id: id,
-                            url: `${rlu}+${hasFile ? hasFile : `image/png`}+${id}`
+                            url: `${rlu}+${hasFile ? hasFile.includes('mov') ? 'video/mp4' : isrc ? 'audio/mp3' : hasFile.includes('ogg') ? 'audio/mp3' : hasFile : `image/png`}+${id}`
                         }
                         ab.push(ob)
                         setimgF(ab)
 
                         // 
                         Obj.addCH([ulr])
+
+                        let obj = {
+                            db: `file_cache`,
+                            name: `storage`,
+                            id: id,
+                            data: {
+                                id: id,
+                                value: bl
+                            }
+                        }
+                        getOrCreateUniqueId(obj)
                         
                     }
                 }
@@ -108,9 +147,11 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
         }
     };
 
-    useEffect(() => {
+    const [lrd, setlrd] = useState(0)
+
+    let gSS = async () => {
         try {
-            let N = CImg(id)
+            let N = await CImg(id)
             if (!isDEF) {
                 getImage(N)
             }
@@ -121,7 +162,16 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
         catch {
             toast.error(`Unable to load Image.`)
         }
-    }, [rl, ncu, src])
+    };
+
+    useEffect(() => {
+        try {
+            gSS()
+        }
+        catch {
+            toast.error(`Unable to load Image.`)
+        }
+    }, [rl, ncu, src, lrd])
 
     return (
         <>
@@ -131,7 +181,26 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
                         {
                             hasFile ? 
                                 <>
-                                   <iframe onError={e => {setim(null)}} className={className} src={im.split('+')[0]} loading='lazy' frameBorder="0"/>
+                                    {
+                                        isrc ? 
+                                            <audio onError={e => {
+                                                // setim(null)
+                                                // window.prompt(`Copy this URL.`, im.split('+')[0])
+                                            }} className={`${className} w-full h-full`} controls src={im.split('+')[0]} /> : 
+                                            <>
+                                                {
+                                                    hasFile && (
+                                                        <>
+                                                            {
+                                                                hasFile.includes('image') ?
+                                                                    <img onError={e => { setim(null) }} className={className} src={im.split('+')[0]} loading='lazy' /> :
+                                                                    <iframe onError={e => {setim(null)}} className={className} src={im.split('+')[0]} loading='lazy' frameBorder="0"/>
+                                                            }
+                                                        </>
+                                                    )
+                                                }
+                                            </>
+                                   }
                                 </> : 
                                 <img onError={e => {setim(null)}} src={im.split('+')[0]} loading={loading} onLoad={onLoad} className={className} />
                         }
