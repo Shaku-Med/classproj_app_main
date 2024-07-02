@@ -17,7 +17,7 @@ let CFILE = ({ val, filtME }) => {
                                 <motion.div layoutId={v.id} onClick={e => {
                                     setPV(v.hasOwnProperty('tty') ? v.file : v.file, v.hasOwnProperty('isr'), v.tty, v.type, v.id, v.hasOwnProperty('fileLength') ? v.fileLength : null)
                                     setaniid(v.id)
-                                }} key={key} className="flexaidna transition-all cursor-pointer hover:brightness-125 max-h-[70px] overflow-hidden flex items-center relative justify-center flex-col max-w-[70px] min-w-[70px] shadow-md p-1 brd rounded-md">
+                                }} key={key} className="flexaidna transition-all cursor-pointer hover:brightness-125 overflow-hidden flex items-center relative justify-center flex-col shadow-md p-1 brd rounded-md min-w-[70px] w-full max-h-[200px]">
                                     {
                                         v.type.includes('image') ?
                                             <div className="aidnkkkaidnkdeaser892 w-full h-full">

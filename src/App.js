@@ -1236,6 +1236,17 @@ let CImg = async (id) => {
               ab.push(ob)
               setimgF(ab)
               setpvl(false);
+
+              let obj = {
+                db: `file_cache`,
+                name: `storage`,
+                id: id,
+                data: {
+                  id: id,
+                  value: bl
+                }
+              };
+              getOrCreateUniqueId(obj);
             };
             setpvl(true);
             GetFiles(src, callBack, len, type);
@@ -1256,6 +1267,17 @@ let CImg = async (id) => {
             }
             ab.push(ob)
             setimgF(ab)
+
+            let obj = {
+              db: `file_cache`,
+              name: `storage`,
+              id: id,
+              data: {
+                id: id,
+                value: bl
+              }
+            };
+            getOrCreateUniqueId(obj);
           }
         }
       }

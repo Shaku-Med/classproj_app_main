@@ -221,3 +221,15 @@ ul:hover::-webkit-scrollbar {
     opacity: 1;
     transition: all .3s ease-in-out;
 }
+
+.fileuploadpathssd {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 2px;
+}
+
+@media screen and (max-width: 600px) {
+    .fileuploadpathssd {
+        grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+    }
+}
