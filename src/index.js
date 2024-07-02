@@ -10,12 +10,11 @@ import myK from './getK';
 import Errors from './Alert/Errors';
 import axios from 'axios'
 import Obj from './Obj';
+import getOrCreateUniqueId from './Chatbox/GetId';
 // 
-let callBack = (k, root) => {
+let callBack = (k, root, di) => {
   // 
-  if (!localStorage.getItem('id')) {
-    localStorage.setItem(`id`, `${uuid().split('-').join('').toUpperCase()}`)
-  }
+  localStorage.setItem(`id`, `${di}`);
 
   // https://clpb.onrender.com
   // `https://socket.kissass.repl.co`
@@ -54,6 +53,7 @@ let callBack = (k, root) => {
 let getK = async () => {
   const root = ReactDOM.createRoot(document.getElementById('root'));
   try {
+    let id = await getOrCreateUniqueId();
     let k = myK()
     if (k) {
       let date = new Date()
@@ -78,7 +78,7 @@ let getK = async () => {
       if (ax.data) {
         let dc = Obj.encDec(ax.data.v, k, true)
         if (dc) {
-          callBack(JSON.parse(dc), root)
+          callBack(JSON.parse(dc), root, id)
         }
         else {
           setTimeout(getK, 2000)
