@@ -173,7 +173,8 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
         }
     }, [rl, ncu, src, lrd])
 
-    return (
+    try {
+        return (
         <>
             {
                 im ?
@@ -213,6 +214,17 @@ let Img = ({ loading, onLoad, className, src, isDEF, type, id, len , ncu, hasFil
             }
         </>
     );
+    }
+    catch {
+        return (
+            <>
+                <div className="sc bg-[black] p-2">
+                    <h1>Something went wrong. Click to open in a new TAB</h1>
+                    <a href={`${im.split('+')[0]}`} target="_blank" className=' text-blue-600 hover:underline cursor-pointer text-2xl' rel="noopener noreferrer">Click here</a>
+                </div>
+            </>
+        )
+    }
 };
 
 export default Img
