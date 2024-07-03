@@ -1186,7 +1186,7 @@ let CImg = async (id) => {
 
   let setPV = async (src, isD, type, dty, id, len) => {
     try {
-      let N = CImg(id)
+      let N = await CImg(id)
       if (N) {
         setpvl(true)
         setpvT(N)
