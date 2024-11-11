@@ -16,6 +16,7 @@ let Storage = () => {
 
 
     const { scp, setscp, store, k, owner, setstore } = useContext(Conn);
+    console.log(store)
     const [drag, setdrag] = useState(false)
     const [rl, setrl] = useState(0)
     const [srl, setsrl] = useState(0)
