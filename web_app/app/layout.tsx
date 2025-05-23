@@ -44,13 +44,13 @@ export default async function RootLayout({
   
   return (
     <html lang="en" className="scroll-smooth">
-      <DynamicCSS cssFile={``} />
-      <body className={`${geistSans.variable} ${geistMono.variable} ${theme} antialiased`}>
+      <DynamicCSS cssFile={`violet.css`} />
+      <body className={`${geistSans.variable} ${geistMono.variable} ${theme} fixed top-0 left-0 w-full h-full overflow-x-hidden antialiased`}>
         <SidebarProvider defaultOpen>
           <Sidebar className="glass-panel sidebar w-full min-w-[400px] max-w-[400px]">
             {sidebar}
           </Sidebar>
-          <SidebarInset className={`md:pl-[144px] p-0`}>
+          <SidebarInset className={`md:pl-[144px] p-0 overflow-x-hidden overflow-y-auto h-full w-full`}>
             {children}
           </SidebarInset>
         </SidebarProvider>

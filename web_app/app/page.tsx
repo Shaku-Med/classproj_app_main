@@ -1,16 +1,30 @@
 'use client'
-import Logo from "@/components/Logo";
-import { useMobileDetector } from "@/hooks/useMobileDetector";
-import { MessageCircleDashed, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "../components/ui/button";
+import { FloatingParticles } from "../components/FloatingParticles";
+import { GlitchText } from "../components/GlitchText";
+import { HolographicCard } from "../components/HolographicCard";
+import { CustomIcons } from "../components/icons";
+import { Navbar } from "../components/Navbar";
+import { HeroSection } from "../components/HeroSection";
+import { FeaturesSection } from "../components/FeaturesSection";
+import { CTASection } from "../components/CTASection";
 
-export default function DefaultChatPage() {
-  let ismobile = useMobileDetector()
-  // 
+export default function ModernLandingPage() {
   return (
-    <div className="h-full w-full flex items-center justify-center">
-      <div className="text-center space-y-4 relative flex items-center justify-center flex-col w-full">
-        <Logo className={`w-50 h-50`} />
-      </div>
-    </div>
+    <>
+      <FloatingParticles />
+      
+      {/* <div className="fixed filter-blur-lg inset-0 bg-gradient-to-br from-background/20 via-background to-primary/20" /> */}
+      
+      <Navbar />
+      
+      <main className="relative z-10">
+        <HeroSection />
+        <FeaturesSection />
+        <CTASection />
+      </main>
+    </>
   );
 }
