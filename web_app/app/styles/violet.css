@@ -15,11 +15,11 @@
 .light {
    --radius: 0.5rem;
    --background: oklch(0.98 0.00 248);
-   --foreground: oklch(0.141 0.005 285.823);
+   --foreground: oklch(0.1 0.03 266);
    --card: oklch(1 0 0);
-   --card-foreground: oklch(0.141 0.005 285.823);
+   --card-foreground: oklch(0.1 0.03 266);
    --popover: oklch(1 0 0);
-   --popover-foreground: oklch(0.141 0.005 285.823);
+   --popover-foreground: oklch(0.1 0.03 266);
    --primary: oklch(0.606 0.25 292.717);
    --primary-foreground: oklch(0.969 0.016 293.756);
    --secondary: oklch(0.967 0.001 286.375);
@@ -38,7 +38,7 @@
    --chart-4: oklch(0.828 0.189 84.429);
    --chart-5: oklch(0.769 0.188 70.08);
    --sidebar: oklch(0.985 0 0);
-   --sidebar-foreground: oklch(0.141 0.005 285.823);
+   --sidebar-foreground: oklch(0.1 0.03 266);
    --sidebar-primary: oklch(0.606 0.25 292.717);
    --sidebar-primary-foreground: oklch(0.969 0.016 293.756);
    --sidebar-accent: oklch(0.967 0.001 286.375);
@@ -49,7 +49,7 @@
 
 /* Dark theme variables */
 .dark {
-   --background: oklch(0.141 0.005 285.823);
+   --background: oklch(0.1 0.03 266);
    --foreground: oklch(0.985 0 0);
    --card: oklch(0.13 0.04 265);
    --card-foreground: oklch(0.985 0 0);
@@ -90,7 +90,7 @@
 /* Apply dark theme variables when system preference is dark and .system class is active */
 @media (prefers-color-scheme: dark) {
   .system {
-   --background: oklch(0.141 0.005 285.823);
+   --background: oklch(0.1 0.03 266);
    --foreground: oklch(0.985 0 0);
    --card: oklch(0.13 0.04 265);
    --card-foreground: oklch(0.985 0 0);
@@ -129,11 +129,11 @@
   .system {
    --radius: 0.5rem;
    --background: oklch(0.98 0.00 248);
-   --foreground: oklch(0.141 0.005 285.823);
+   --foreground: oklch(0.1 0.03 266);
    --card: oklch(1 0 0);
-   --card-foreground: oklch(0.141 0.005 285.823);
+   --card-foreground: oklch(0.1 0.03 266);
    --popover: oklch(1 0 0);
-   --popover-foreground: oklch(0.141 0.005 285.823);
+   --popover-foreground: oklch(0.1 0.03 266);
    --primary: oklch(0.606 0.25 292.717);
    --primary-foreground: oklch(0.969 0.016 293.756);
    --secondary: oklch(0.967 0.001 286.375);
@@ -152,7 +152,7 @@
    --chart-4: oklch(0.828 0.189 84.429);
    --chart-5: oklch(0.769 0.188 70.08);
    --sidebar: oklch(0.985 0 0);
-   --sidebar-foreground: oklch(0.141 0.005 285.823);
+   --sidebar-foreground: oklch(0.1 0.03 266);
    --sidebar-primary: oklch(0.606 0.25 292.717);
    --sidebar-primary-foreground: oklch(0.969 0.016 293.756);
    --sidebar-accent: oklch(0.967 0.001 286.375);

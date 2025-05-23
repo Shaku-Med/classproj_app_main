@@ -44,7 +44,7 @@ export default async function RootLayout({
   
   return (
     <html lang="en" className="scroll-smooth">
-      <DynamicCSS cssFile={`violet.css`} />
+      {/* <DynamicCSS cssFile={`violet.css`} /> */}
       <body className={`${geistSans.variable} ${geistMono.variable} ${theme} fixed top-0 left-0 w-full h-full overflow-x-hidden antialiased`}>
         <SidebarProvider defaultOpen>
           <Sidebar className="glass-panel sidebar w-full min-w-[400px] max-w-[400px]">

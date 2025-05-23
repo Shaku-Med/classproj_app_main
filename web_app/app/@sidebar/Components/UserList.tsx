@@ -336,14 +336,14 @@ export function UserList({ searchQuery, filters }: UserListProps): JSX.Element {
                 damping: 30, 
                 duration: 0.3 
               }}
-              className={`flex items-center gap-3 p-2 rounded-lg hover:bg-accent cursor-pointer transition-colors group ${
-                user.unread > 0 ? "bg-accent/50" : ""
+              className={`flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 cursor-pointer transition-colors group ${
+                user.unread > 0 ? "bg-primary/15" : ""
               }`}
             >
               <div className="relative">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-primary/15 text-primary-foreground">{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 {user.isGroup ? (
                   <span className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full w-4 h-4 flex items-center justify-center text-[10px]">

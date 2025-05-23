@@ -31,7 +31,7 @@ export const NotificationsDropdown = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 w-6 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-6 h-4 bg-primary/70 text-background rounded-full text-xs flex items-center justify-center">
             3
           </span>
         </Button>

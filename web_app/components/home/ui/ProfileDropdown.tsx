@@ -15,7 +15,7 @@ export const ProfileDropdown = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-white/10 px-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-t from-card to-primary rounded-full flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
           <span className="hidden lg:block">Profile</span>
