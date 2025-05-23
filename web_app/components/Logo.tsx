@@ -1,7 +1,7 @@
 const Logo = ({...props}) => {
     return (
       <>
-        <img src="/icons/web/icon-512.png" alt="logo" {...props} />
+        <img src="/Icons/web/icon-512.png" alt="logo" {...props} />
       </>
     )
   }

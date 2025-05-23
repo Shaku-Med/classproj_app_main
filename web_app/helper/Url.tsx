@@ -1,1 +1,1 @@
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.118:3000' : 'https://preek.medzyamara.dev'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://192.168.1.118:3000' : 'https://www.pweeq.com'

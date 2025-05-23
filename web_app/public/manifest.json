@@ -1,7 +1,7 @@
 {
-    "name": "Preek",
-    "short_name": "Preek",
-    "description": "Tired of boring social apps? Preek connects you with real people through authentic conversations - no algorithms, no noise, just genuine connection.",
+    "name": "pweeq",
+    "short_name": "pweeq",
+    "description": "Tired of boring social apps? pweeq connects you with real people through authentic conversations - no algorithms, no noise, just genuine connection.",
     "start_url": "/",
     "display": "standalone",
     "orientation": "portrait-primary",
@@ -47,7 +47,7 @@
         "sizes": "1280x720",
         "type": "image/png",
         "form_factor": "wide",
-        "label": "Preek home screen on desktop"
+        "label": "pweeq home screen on desktop"
       },
       {
         "src": "/screenshots/mobile-chat.png",
@@ -89,12 +89,12 @@
     "related_applications": [
       {
         "platform": "play",
-        "url": "https://play.google.com/store/apps/details?id=com.preek.app",
-        "id": "com.preek.app"
+        "url": "https://play.google.com/store/apps/details?id=com.pweeq.app",
+        "id": "com.pweeq.app"
       },
       {
         "platform": "itunes",
-        "url": "https://apps.apple.com/app/preek/id123456789",
+        "url": "https://apps.apple.com/app/pweeq/id123456789",
         "id": "123456789"
       }
     ],
@@ -107,7 +107,7 @@
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
     "protocol_handlers": [
       {
-        "protocol": "web+preek",
+        "protocol": "web+pweeq",
         "url": "/handle?url=%s"
       }
     ],
