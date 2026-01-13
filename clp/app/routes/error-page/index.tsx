@@ -7,7 +7,13 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-const ErrorPage = () => {
+interface ErrorPageProps {
+  title?: string;
+  message?: string;
+  showbuttons?: boolean;
+}
+
+const ErrorPage = ({ title, message, showbuttons = true }: ErrorPageProps) => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-destructive/5 via-destructive/3 to-transparent" />
@@ -34,10 +40,10 @@ const ErrorPage = () => {
           
           <div className="space-y-3 sm:space-y-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-tight">
-              Why am I here?
+              {title || 'Why am I here?'}
             </h1>
             <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-xl mx-auto">
-              You are seeing this page cuz we do not want you to access a broken page
+              {message || 'You are seeing this page cuz we do not want you to access a broken page'}
             </p>
           </div>
         </div>
@@ -47,20 +53,22 @@ const ErrorPage = () => {
             We redirected you here to prevent you from encountering a broken or inaccessible page.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-            <Link
-              to="/auth"
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors duration-200 w-full sm:w-auto"
-            >
-              Go to Sign In
-            </Link>
-            <button
-              onClick={() => window.history.back()}
-              className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-lg transition-colors duration-200 w-full sm:w-auto"
-            >
-              Go Back
-            </button>
-          </div>
+          {showbuttons && (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+              <Link
+                to="/auth"
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors duration-200 w-full sm:w-auto"
+              >
+                Go to Sign In
+              </Link>
+              <button
+                onClick={() => window.history.back()}
+                className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-lg transition-colors duration-200 w-full sm:w-auto"
+              >
+                Go Back
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

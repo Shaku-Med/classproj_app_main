@@ -1,8 +1,52 @@
-import jwt from 'jsonwebtoken';
 import { encrypt, decrypt } from '../../Algorithm';
+
+const isServerEnvironment = (): boolean => {
+    try {
+        return typeof process !== 'undefined' && 
+               process.versions != null && 
+               process.versions.node != null &&
+               typeof Buffer !== 'undefined';
+    } catch {
+        return false;
+    }
+};
+
+let jwt: any = null;
+let jwtLoadAttempted = false;
+
+const getJWT = async () => {
+    if (jwt !== null) return jwt;
+    
+    if (jwtLoadAttempted) return null;
+    jwtLoadAttempted = true;
+    
+    if (!isServerEnvironment()) {
+        console.error('JWT operations require server environment');
+        return null;
+    }
+    
+    try {
+        const jwtModule = await import('jsonwebtoken');
+        jwt = jwtModule.default || jwtModule;
+        return jwt;
+    } catch (error: any) {
+        console.error('Failed to load jsonwebtoken:', error?.message || error);
+        return null;
+    }
+};
 
 export const EncryptCombine = async (data: any, keys: any[], options?: object) => {
     try {
+        if (!isServerEnvironment()) {
+            console.error('EncryptCombine requires server environment');
+            return null;
+        }
+
+        const jwtModule = await getJWT();
+        if (!jwtModule) {
+            return null;
+        }
+
         let encryptedData = typeof data === 'object' ? JSON.stringify(data) : data;
         
         if (!keys || keys.length === 0) {
@@ -20,7 +64,7 @@ export const EncryptCombine = async (data: any, keys: any[], options?: object) =
 
         if(!encryptedData) return null;
         const finalKey = keys[keys.length - 1];
-        const jwtToken = jwt.sign({ data: encryptedData }, finalKey, options || {
+        const jwtToken = jwtModule.sign({ data: encryptedData }, finalKey, options || {
             algorithm: 'HS512',
         });
         
@@ -33,6 +77,16 @@ export const EncryptCombine = async (data: any, keys: any[], options?: object) =
 
 export const DecryptCombine = async (data: any, keys: any[], options?: object) => {
     try {
+        if (!isServerEnvironment()) {
+            console.error('DecryptCombine requires server environment');
+            return null;
+        }
+
+        const jwtModule = await getJWT();
+        if (!jwtModule) {
+            return null;
+        }
+
         if(!data) return null;
         let encryptedData = typeof data === 'object' ? JSON.stringify(data) : data;
         
@@ -41,7 +95,7 @@ export const DecryptCombine = async (data: any, keys: any[], options?: object) =
         }
         
         const finalKey = keys[keys.length - 1];
-        const decoded: any = jwt.verify(encryptedData, finalKey, options || {});
+        const decoded: any = jwtModule.verify(encryptedData, finalKey, options || {});
         
         let decryptedData = decoded?.data;
         
@@ -61,7 +115,7 @@ export const DecryptCombine = async (data: any, keys: any[], options?: object) =
         } catch {
             return decryptedData;
         }
-    } catch (e) {
+    } catch (e: any) {
         console.error("Decryption failed:", e);
         return e?.toString()?.includes('expired') ? undefined : null;
     }

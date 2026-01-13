@@ -13,4 +13,11 @@ export default defineConfig({
     host: true,
     cors: true,
   },
+  ssr: {
+    noExternal: ['@supabase/supabase-js'],
+    external: ['jsonwebtoken', 'safe-buffer'],
+  },
+  optimizeDeps: {
+    exclude: ['jsonwebtoken', 'safe-buffer'],
+  },
 });

@@ -43,11 +43,29 @@ const TOKEN_KEY_CONFIGS: readonly TokenKeyConfig[] = [
         expiresIn: "2m"
     },
     {
-        name: "error_key",
-        envKey: "ERROR_KEY",
+        name: "session_token",
+        envKey: "SESSION_TOKEN",
         algorithm: "HS512",
         expiresIn: "2m"
     },
+    {
+        name: "csrf_token",
+        envKey: "CSRF_TOKEN",
+        algorithm: "HS512",
+        expiresIn: "2m"
+    },
+    {
+        name: "authenticated_session_token",
+        envKey: "AUTHENTICATED_SESSION_TOKEN",
+        algorithm: "HS512",
+        expiresIn: "2m"
+    },
+    {
+        name: "auth_token",
+        envKey: "AUTH_TOKEN",
+        algorithm: "HS512",
+        expiresIn: "1h"
+    }
 ] as const;
 
 const createTokenKeys = (): TokenKey[] => {

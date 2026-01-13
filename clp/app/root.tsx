@@ -6,6 +6,7 @@ import {
   redirect,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -15,6 +16,9 @@ import { allowedRoutes } from "./utils/allowed-routes";
 import { handleRedirect } from "./utils/handle-redirect";
 import { useEffect } from "react";
 import SetToken from "./utils/Security/unsharedkeyEncryption/Combined/Verification/SetToken";
+import { handleSessionToken } from "./utils/session-token";
+import { Cookie } from "./utils/cookie-parser";
+import ErrorPage from "./routes/error-page";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -36,12 +40,7 @@ export const loader = async ({request}: {request: Request}) => {
     const pathname = url.pathname.toLowerCase()
     
     if(!is_authenticated) {
-      let token = await SetToken(request.headers, {
-        expiresIn: '1h',
-        algorithm: 'HS512'
-      }, [
-        'error_key',
-      ])
+      let token = await handleSessionToken({ request, is_authenticated });
       if(!token && !pathname.startsWith('/error')) return handleRedirect('/error', request);
       
       const isAllowedRoute = allowedRoutes.some(route => pathname.startsWith(route.toLowerCase()))
@@ -49,11 +48,34 @@ export const loader = async ({request}: {request: Request}) => {
       if (!isAllowedRoute && token) {
         return handleRedirect('/auth', request)
       }
+      
+      if (token) {
+        if(token.valid_global_id) return { data: null, status: 200 };
+        const expiresDate = new Date(token.expiresAt);
+        const cookieHeader = Cookie.set('global_id', token.data, {
+          expires: expiresDate,
+          httpOnly: true,
+          secure: true,
+          sameSite: 'Strict',
+          path: '/',
+          priority: 'high'
+        });
+        return { data: null, status: 200, headers: {
+          headers: {
+            'Set-Cookie': cookieHeader
+          }
+        } };
+      }
+      
+      return null
     }
   }
   catch (error) {
     console.error(error)
-    return handleRedirect('/auth', request)
+    // return handleRedirect('/auth', request)
+    return { data: null, status: 500, headers: {
+      status: 500,
+    } };
   }
 }
 
@@ -76,5 +98,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  let data = useLoaderData<typeof loader>();
+  if(!data || data.status !== 200) {
+    return <ErrorPage />
+  }
   return <Outlet />;
 }

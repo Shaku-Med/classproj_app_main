@@ -14,6 +14,7 @@ const SetToken = async (headers: Headers, options?: { expiresIn?: string; algori
             'user-agent': h.get('user-agent')?.split(/\s+/)?.join(''),
             'x-forwarded-for': gip
         }
+        // console.log('o', o);
         let obj: any = {
             ip: gip,
             ...o
@@ -27,6 +28,7 @@ const SetToken = async (headers: Headers, options?: { expiresIn?: string; algori
         }
         // 
 
+        if(Object.values(obj).some(value => value === null || value === undefined || value === '')) return null;
         const keyNames = buildKeyNames(['token1', 'token2', ...addKeyNames || []]);
         const encryptionKeys = await getAllKeys(keyNames);
         if(!encryptionKeys) return null;

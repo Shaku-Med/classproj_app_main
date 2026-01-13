@@ -1,7 +1,6 @@
 import { Outlet, type MetaFunction } from "react-router"
 import AuthHero from "./components/AuthHero"
 import AuthMap from "./components/AuthMap"
-import SetToken from "~/utils/Security/unsharedkeyEncryption/Combined/Verification/SetToken"
 
 export const meta: MetaFunction = () => {
     return [
@@ -13,6 +12,7 @@ export const meta: MetaFunction = () => {
 export const loader = async ({request}: {request: Request}) => {
     try {
         console.log("Auth Layout Loader")
+        return null;
     }
     catch (error) {
         console.error(error)

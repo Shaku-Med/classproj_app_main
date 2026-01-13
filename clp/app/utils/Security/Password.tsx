@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { getAllKeys } from './unsharedkeyEncryption/Combined/Verification/TokenKeys';
 import { DecryptCombine, EncryptCombine } from './unsharedkeyEncryption/Combined/Combined';
 import { getCookie } from './Token';
-import db from '../Database/supabase';
+import db from '../Database/Supabase';
 
 export const PasswordHash = async (password: string) => {
     try {
