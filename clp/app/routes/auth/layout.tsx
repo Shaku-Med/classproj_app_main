@@ -1,4 +1,4 @@
-import { Outlet, type MetaFunction } from "react-router"
+import { data, Outlet, type MetaFunction } from "react-router"
 import AuthHero from "./components/AuthHero"
 import AuthMap from "./components/AuthMap"
 
@@ -11,12 +11,11 @@ export const meta: MetaFunction = () => {
 
 export const loader = async ({request}: {request: Request}) => {
     try {
-        console.log("Auth Layout Loader")
-        return null;
+        
     }
     catch (error) {
-        console.error(error)
-        return null;
+        console.error(`Error found in Auth Layout Loader: -----> \n`, error)
+        return data(null, { status: 500 });
     }
 }
 
