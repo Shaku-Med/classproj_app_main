@@ -7,6 +7,12 @@ interface SessionTokenProps {
   is_authenticated: boolean
 }
 
+interface ValidateSessionTokenProps {
+  token: string
+  headers: Headers
+  is_authenticated: boolean
+}
+
 const makeSessionToken = async (props: SessionTokenProps, keys: string[]): Promise<{ data: string, expiresAt: string } | null> => {
   try {
     let token = await SetToken(props.request.headers, {
@@ -53,5 +59,20 @@ export const handleSessionToken = async (props: SessionTokenProps): Promise<{ da
   catch (error) {
     console.error(`Error found in handleSessionToken: -----> \n`, error)
     return null;
+  }
+}
+
+const validateSessionToken = async (token: string, headers: Headers): Promise<boolean> => {
+  try {
+    const verify_Token = await VerifyToken({
+      token: token,
+      addedKeyNames: ['session_token']
+    }, headers);
+    if(!verify_Token) return false;
+    return true;
+  }
+  catch (error) {
+    console.error(`Error found in validateSessionToken: -----> \n`, error)
+    return false;
   }
 }
