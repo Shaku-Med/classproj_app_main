@@ -31,6 +31,56 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime())
 }
 
+function parseDateInput(input: string, allowAge: boolean) {
+  const trimmed = input.trim()
+  if (!trimmed) {
+    return undefined
+  }
+
+  const mdYMatch = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/)
+  if (mdYMatch) {
+    const month = Number(mdYMatch[1])
+    const day = Number(mdYMatch[2])
+    const year = Number(mdYMatch[3])
+    const date = new Date(year, month - 1, day)
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    ) {
+      return date
+    }
+  }
+
+  const yMdMatch = trimmed.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/)
+  if (yMdMatch) {
+    const year = Number(yMdMatch[1])
+    const month = Number(yMdMatch[2])
+    const day = Number(yMdMatch[3])
+    const date = new Date(year, month - 1, day)
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    ) {
+      return date
+    }
+  }
+
+  if (allowAge) {
+    const ageMatch = trimmed.match(/^\d{1,3}$/)
+    if (ageMatch) {
+      const age = Number(ageMatch[0])
+      if (age >= 0) {
+        const today = new Date()
+        return new Date(today.getFullYear() - age, today.getMonth(), today.getDate())
+      }
+    }
+  }
+
+  return undefined
+}
+
 const DatePicker = ({
   date,
   onDateChange,
@@ -53,10 +103,25 @@ const DatePicker = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
     setValue(inputValue)
-    const parsedDate = new Date(inputValue)
+    const parsedDate = parseDateInput(inputValue, false)
     if (isValidDate(parsedDate)) {
       onDateChange?.(parsedDate)
       setMonth(parsedDate)
+    }
+  }
+
+  const handleInputBlur = () => {
+    if (!value.trim()) {
+      onDateChange?.(undefined)
+      return
+    }
+    const parsedDate = parseDateInput(value, true)
+    if (isValidDate(parsedDate)) {
+      onDateChange?.(parsedDate)
+      setMonth(parsedDate)
+      setValue(formatDate(parsedDate))
+    } else {
+      onDateChange?.(undefined)
     }
   }
 
@@ -73,6 +138,7 @@ const DatePicker = ({
         placeholder={placeholder}
         className="bg-background pr-10"
         onChange={handleInputChange}
+        onBlur={handleInputBlur}
         disabled={disabled}
         onKeyDown={(e) => {
           if (e.key === "ArrowDown") {

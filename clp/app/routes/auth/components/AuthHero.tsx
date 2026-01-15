@@ -30,12 +30,19 @@ const AuthHero = () => {
         <div className="space-y-3 sm:space-y-4 lg:space-y-5">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-tight mb-2 sm:mb-3">
-              {greeting} <br /> <span className={` text-primary`}>
-              Welcome to CLP
+              <span
+                key={greeting}
+                className="block animate-in fade-in slide-in-from-bottom-2 duration-500"
+              >
+                {greeting}
               </span>
+              <span className="text-primary">Welcome to CLP</span>
             </h1>
             {holiday && (
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-primary font-medium">
+              <p
+                key={holiday.greeting}
+                className="text-sm sm:text-base md:text-lg lg:text-xl text-primary font-medium animate-in fade-in slide-in-from-bottom-1 duration-500"
+              >
                 {holiday.greeting}
               </p>
             )}

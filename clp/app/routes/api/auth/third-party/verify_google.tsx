@@ -1,3 +1,7 @@
+import { redirect } from "react-router"
+import { handleRedirect } from "~/utils/handle-redirect"
+import { validateApiSessions } from "~/utils/session-token"
+
 type GoogleUserInfo = {
   id: string
   email: string
@@ -33,6 +37,15 @@ export const action = async ({ request }: { request: Request }) => {
   }
 
   try {
+    let validate_api_sessions: boolean | {success: boolean, redirect_url?: string, response?: {
+      data: any,
+      status: number
+    }} = await validateApiSessions(request);
+    if(!validate_api_sessions) return new Response(null, { status: 401 });
+    if(typeof validate_api_sessions === 'object' && !validate_api_sessions.success) return new Response(validate_api_sessions.response?.data, { status: validate_api_sessions.response?.status || 401 });
+    if(typeof validate_api_sessions === 'object' && validate_api_sessions.redirect_url) return redirect(validate_api_sessions.redirect_url, request);
+
+
     const body = (await request.json()) as VerifyGoogleRequestBody
 
     if (!body?.accessToken || typeof body.accessToken !== "string") {
@@ -70,4 +83,8 @@ export const action = async ({ request }: { request: Request }) => {
       headers: { "Content-Type": "application/json" },
     })
   }
+}
+
+export const loader = async ({ request }: { request: Request }) => {
+  return handleRedirect('/auth', request)
 }

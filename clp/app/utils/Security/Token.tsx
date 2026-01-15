@@ -1,4 +1,4 @@
-import { EnvValidator } from "../EnvValidator";
+import { EnvValidator } from "../Database/EnvValidator";
 
 export const SetTokenKeys = [
     {

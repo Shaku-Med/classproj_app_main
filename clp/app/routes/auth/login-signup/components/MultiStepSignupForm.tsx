@@ -19,10 +19,13 @@ import {
   validateMiddleName,
   validateLastName,
 } from "../utils/validation"
+import { useAuth } from "../../lib/Context"
+import { Loader2 } from "lucide-react"
 
 const TOTAL_STEPS = 4
 
 const MultiStepSignupForm = () => {
+  const { active } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
 
   const [email, setEmail] = useState("")
@@ -233,38 +236,46 @@ const MultiStepSignupForm = () => {
               onLastNameChange={handleLastNameChange}
             />
           )}
-          <div className="flex gap-3">
-            {currentStep > 1 && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handlePrevious}
-                className="flex-1 border-2"
-              >
-                Previous
-              </Button>
-            )}
-            {currentStep < TOTAL_STEPS ? (
-              <Button
-                type="button"
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className="flex-1 border-2"
-                size="lg"
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                disabled={!canProceed()}
-                className="flex-1 border-2"
-                size="lg"
-              >
-                Create account
-              </Button>
-            )}
-          </div>
+          {
+            active ? (
+              <div className="flex gap-3">
+                {currentStep > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePrevious}
+                    className="flex-1 border-2"
+                  >
+                    Previous
+                  </Button>
+                )}
+                {currentStep < TOTAL_STEPS ? (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={!canProceed()}
+                    className="flex-1 border-2"
+                    size="lg"
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={!canProceed()}
+                    className="flex-1 border-2"
+                    size="lg"
+                  >
+                    Create account
+                  </Button>
+                )}
+              </div>
+            ): (
+              <div className="flex gap-3 justify-center items-center w-full border rounded-md p-2">
+                <Loader2 className="size-6 animate-spin text-primary" />
+              </div>
+            )
+          }
           <div className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link

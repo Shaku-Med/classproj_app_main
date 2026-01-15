@@ -6,8 +6,11 @@ import { Label } from "~/components/ui/label"
 import ThirdPartyAuth from "./third-party-auth/ThirdPartyAuth"
 import Divider from "./Divider"
 import { validateEmail } from "../utils/validation"
+import { useAuth } from "../../lib/Context"
+import { Loader2 } from "lucide-react"
 
 const LoginForm = () => {
+  const { active } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [emailError, setEmailError] = useState<string | undefined>()
@@ -88,9 +91,17 @@ const LoginForm = () => {
             <p className="text-xs text-destructive">{passwordError}</p>
           )}
         </div>
-        <Button type="submit" className="w-full border-2" size="lg" disabled={isThirdPartyAuth}>
-          Continue with email
-        </Button>
+        {
+          active ? (
+            <Button type="submit" className="w-full border-2" size="lg" disabled={isThirdPartyAuth}>
+              Continue with email
+            </Button>
+          ): (
+            <div className="flex gap-3 justify-center items-center w-full border rounded-md p-2">
+              <Loader2 className="size-6 animate-spin text-primary" />
+            </div>
+          ) 
+        }
         <div className="text-center text-xs sm:text-sm text-muted-foreground">
           Don't have an account?{" "}
           <Link

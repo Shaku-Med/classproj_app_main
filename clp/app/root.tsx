@@ -20,7 +20,7 @@ import SetToken from "./utils/Security/unsharedkeyEncryption/Combined/Verificati
 import { handleSessionToken } from "./utils/session-token";
 import { Cookie } from "./utils/cookie-parser";
 import ErrorPage from "./routes/error-page";
-import { is_development } from "./utils/is_authenticated";
+import { is_development, isAuthenticated } from "./utils/is_authenticated";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -37,7 +37,7 @@ export const links: Route.LinksFunction = () => [
 
 export const loader = async ({request}: {request: Request}) => {
   try {
-    let is_authenticated = false
+    let is_authenticated = await isAuthenticated(request);
     const url = new URL(request.url)
     const pathname = url.pathname.toLowerCase()
     

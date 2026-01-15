@@ -65,6 +65,12 @@ const TOKEN_KEY_CONFIGS: readonly TokenKeyConfig[] = [
         envKey: "AUTH_TOKEN",
         algorithm: "HS512",
         expiresIn: "1h"
+    },
+    {
+        name: "quick_auth",
+        envKey: "QUICK_AUTH",
+        algorithm: "HS512",
+        expiresIn: "2m"
     }
 ] as const;
 

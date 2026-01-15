@@ -8,6 +8,7 @@ export default [
     route('api', 'routes/api/layout.tsx', [
         route('', 'routes/api/index.tsx'),
         route('auth/third-party/verify-google', 'routes/api/auth/third-party/verify_google.tsx'),
+        route('auth/third-party/verify-github', 'routes/api/auth/third-party/verify_github.tsx'),
     ]),
     route(`auth`, 'routes/auth/layout.tsx', [
         index('routes/auth/login-signup/index.tsx'),
