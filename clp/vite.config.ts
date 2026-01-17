@@ -8,6 +8,9 @@ config()
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   server: {
     port: 3000,
     host: true,

@@ -1,6 +1,7 @@
 import { Button } from "~/components/ui/button"
 import { Github } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import { log } from "~/utils/log"
 
 interface GitHubButtonProps {
   disabled?: boolean
@@ -10,6 +11,7 @@ interface GitHubButtonProps {
 const GitHubButton = ({ disabled, setIsThirdPartyAuth }: GitHubButtonProps) => {
   const handledCallbackRef = useRef(false)
   const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID || ""
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     if (handledCallbackRef.current) return
@@ -25,6 +27,7 @@ const GitHubButton = ({ disabled, setIsThirdPartyAuth }: GitHubButtonProps) => {
     const redirectUri = `${window.location.origin}${window.location.pathname}`
 
     const handleCallback = async () => {
+      let redirected = false
       try {
         const response = await fetch("/api/auth/third-party/verify-github", {
           method: "POST",
@@ -35,15 +38,33 @@ const GitHubButton = ({ disabled, setIsThirdPartyAuth }: GitHubButtonProps) => {
         })
 
         if (!response.ok) {
-          throw new Error("Failed to verify GitHub login")
+          setErrorMessage("GitHub sign-in failed. Please try again.")
+          return
         }
 
         const data = await response.json()
-        console.log("GitHub Login Data (from backend):", data)
+ 
+        if (data?.access_token) {
+          const token = encodeURIComponent(String(data.access_token))
+          redirected = true
+          window.location.assign(`/auth/thirdparty?access_token=${token}`)
+          return
+        }
+
+        window.location.reload()
+
         setIsThirdPartyAuth?.(true)
       } catch (error) {
-        console.error("GitHub login error:", error)
+        setErrorMessage("GitHub sign-in failed. Please try again.")
+        log({
+          type: "error",
+          message: "GitHub login error",
+          error: error instanceof Error ? error : new Error(String(error)),
+        })
       } finally {
+        if (redirected) {
+          return
+        }
         url.searchParams.delete("code")
         url.searchParams.delete("state")
         url.searchParams.delete("scope")
@@ -69,16 +90,23 @@ const GitHubButton = ({ disabled, setIsThirdPartyAuth }: GitHubButtonProps) => {
   }
 
   return (
-    <Button
-      type="button"
-      variant={`outline`}
-      className={`w-full`}
-      onClick={handleClick}
-      disabled={disabled || !GITHUB_CLIENT_ID}
-    >
-      <Github className="size-5" />
-      Continue with GitHub
-    </Button>
+    <>
+      <Button
+        type="button"
+        variant={`outline`}
+        className={`w-full`}
+        onClick={handleClick}
+        disabled={disabled || !GITHUB_CLIENT_ID}
+      >
+        <Github className="size-5" />
+        Continue with GitHub
+      </Button>
+      {errorMessage ? (
+        <p className="mt-2 text-sm text-red-600" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
+    </>
   )
 }
 

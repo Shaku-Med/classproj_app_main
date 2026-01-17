@@ -1,11 +1,17 @@
 
+import { log } from '../../utils/log'
+
 export const loader = async ({request}: {request: Request}) => {
    try {
-    console.log('API Index')
+    log({ type: 'info', message: 'API Index' })
       return new Response('Hello', {status: 404})
    }
    catch (error) {
-     console.error(error)
+     log({
+        type: 'error',
+        message: 'API Index loader error',
+        error: error instanceof Error ? error : new Error(String(error)),
+     })
      return new Response('Hello', {status: 500})
    }
 }

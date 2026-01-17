@@ -1,4 +1,11 @@
-type ValidatorName = "password" | "deviceId"
+type ValidatorName =
+    | "password"
+    | "deviceId"
+    | "username"
+    | "name"
+    | "account_name"
+    | "date_of_birth"
+    | "optional_name"
 
 export type SingleValidatorConfig = {
     value: unknown
@@ -36,6 +43,54 @@ const builtInValidators: Record<ValidatorName, InternalValidator> = {
         const v = value.trim()
         if (v.length !== 64) return "Invalid device id length"
         if (!/^[0-9a-fA-F]{64}$/.test(v)) return "Invalid device id format"
+        return null
+    },
+    username: (value) => {
+        if (typeof value !== "string") return "Invalid username"
+        const v = value.trim()
+        if (v.length < 3) return "Username too short"
+        if (v.length > 30) return "Username too long"
+        if (!/^[A-Za-z0-9._-]+$/.test(v)) return "Invalid username format"
+        return null
+    },
+    name: (value) => {
+        if (typeof value !== "string") return "Invalid name"
+        const v = value.trim()
+        if (v.length < 1) return "Name too short"
+        if (v.length > 50) return "Name too long"
+        if (!/^[A-Za-z\s'-]+$/.test(v)) return "Invalid name format"
+        return null
+    },
+    optional_name: (value) => {
+        if (value === null || value === undefined || value === "") return null
+        if (typeof value !== "string") return "Invalid name"
+        const v = value.trim()
+        if (v.length < 1) return "Name too short"
+        if (v.length > 50) return "Name too long"
+        if (!/^[A-Za-z\s'-]+$/.test(v)) return "Invalid name format"
+        return null
+    },
+    account_name: (value) => {
+        if (value === null || value === undefined || value === "") return null
+        if (typeof value !== "string") return "Invalid account name"
+        const v = value.trim()
+        if (v.length < 3) return "Account name too short"
+        if (v.length > 50) return "Account name too long"
+        if (!/^[A-Za-z0-9\s_-]+$/.test(v)) return "Invalid account name format"
+        return null
+    },
+    date_of_birth: (value) => {
+        if (typeof value !== "string") return "Invalid date of birth"
+        const v = value.trim()
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return "Invalid date of birth format"
+        const date = new Date(`${v}T00:00:00.000Z`)
+        if (Number.isNaN(date.getTime())) return "Invalid date of birth"
+        const today = new Date()
+        const min = new Date()
+        min.setUTCFullYear(today.getUTCFullYear() - 120)
+        const max = new Date()
+        max.setUTCFullYear(today.getUTCFullYear() - 13)
+        if (date < min || date > max) return "Invalid date of birth range"
         return null
     },
 }

@@ -1,6 +1,7 @@
 import { ChromeIcon } from "lucide-react"
 import { Button } from "~/components/ui/button"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import { log } from "~/utils/log"
 
 interface GoogleButtonProps {
   disabled?: boolean
@@ -32,6 +33,7 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ""
 const GoogleButton = ({ disabled, setIsThirdPartyAuth }: GoogleButtonProps) => {
   const scriptLoaded = useRef(false)
   const tokenClientRef = useRef<TokenClient | null>(null)
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     if (scriptLoaded.current || !GOOGLE_CLIENT_ID) return
@@ -75,15 +77,29 @@ const GoogleButton = ({ disabled, setIsThirdPartyAuth }: GoogleButtonProps) => {
       })
 
       if (!backendResponse.ok) {
-        throw new Error("Failed to verify Google login")
+        setErrorMessage("Google sign-in failed. Please try again.")
+        return
       }
 
       const data = await backendResponse.json()
-      console.log("Google Login Data (from backend):", data)
+
+      if (data?.access_token) {
+        const token = encodeURIComponent(String(data.access_token))
+        window.location.assign(`/auth/thirdparty?access_token=${token}`)
+        return
+      }
+
+      // reload the page when success
+      window.location.reload()
 
       setIsThirdPartyAuth?.(true)
     } catch (error) {
-      console.error("Google login error:", error)
+      setErrorMessage("Google sign-in failed. Please try again.")
+      log({
+        type: "error",
+        message: "Google login error",
+        error: error instanceof Error ? error : new Error(String(error)),
+      })
     }
   }
 
@@ -91,7 +107,10 @@ const GoogleButton = ({ disabled, setIsThirdPartyAuth }: GoogleButtonProps) => {
     if (disabled) return
 
     if (!scriptLoaded.current) {
-      console.error("Google Identity Services script not loaded")
+      log({
+        type: "warning",
+        message: "Google Identity Services script not loaded",
+      })
       return
     }
 
@@ -103,16 +122,23 @@ const GoogleButton = ({ disabled, setIsThirdPartyAuth }: GoogleButtonProps) => {
   }
 
   return (
-    <Button
-      type="button"
-      variant={`outline`}
-      className={`w-full`}
-      onClick={handleClick}
-      disabled={disabled || !GOOGLE_CLIENT_ID}
-    >
-      <ChromeIcon className="size-5"  />
-      Continue with Google
-    </Button>
+    <>
+      <Button
+        type="button"
+        variant={`outline`}
+        className={`w-full`}
+        onClick={handleClick}
+        disabled={disabled || !GOOGLE_CLIENT_ID}
+      >
+        <ChromeIcon className="size-5"  />
+        Continue with Google
+      </Button>
+      {errorMessage ? (
+        <p className="mt-2 text-sm text-red-600" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
+    </>
   )
 }
 

@@ -1,6 +1,7 @@
 import { redirect } from "react-router"
 import { handleRedirect } from "~/utils/handle-redirect"
 import { validateApiSessions } from "~/utils/session-token"
+import { handleusersdata } from "~/routes/api/auth/lib/handleusersdata"
 
 type GoogleUserInfo = {
   id: string
@@ -37,14 +38,22 @@ export const action = async ({ request }: { request: Request }) => {
   }
 
   try {
-    let validate_api_sessions: boolean | {success: boolean, redirect_url?: string, response?: {
-      data: any,
-      status: number
-    }} = await validateApiSessions(request);
+    type ValidateApiSessionsResult =
+      | boolean
+      | {
+          success: boolean
+          redirect_url?: string
+          headers?: Headers
+          response?: {
+            data: any
+            status: number
+            headers?: Headers
+          }
+        }
+    let validate_api_sessions: ValidateApiSessionsResult = await validateApiSessions(request);
     if(!validate_api_sessions) return new Response(null, { status: 401 });
-    if(typeof validate_api_sessions === 'object' && !validate_api_sessions.success) return new Response(validate_api_sessions.response?.data, { status: validate_api_sessions.response?.status || 401 });
+    if(typeof validate_api_sessions === 'object' && !validate_api_sessions.success) return new Response(validate_api_sessions.response?.data, { status: validate_api_sessions.response?.status || 401, headers: validate_api_sessions.response?.headers });
     if(typeof validate_api_sessions === 'object' && validate_api_sessions.redirect_url) return redirect(validate_api_sessions.redirect_url, request);
-
 
     const body = (await request.json()) as VerifyGoogleRequestBody
 
@@ -56,26 +65,38 @@ export const action = async ({ request }: { request: Request }) => {
     }
 
     const userInfo = await fetchGoogleUserInfo(body.accessToken)
-
-    // TODO: Integrate with your user system:
-    // - Find or create a local user record using userInfo.email / userInfo.id
-    // - Create a session / issue your own JWT
-    // - Attach session cookie to the response
-
-    return new Response(
-      JSON.stringify({
-        user: {
-          id: userInfo.id,
-          email: userInfo.email,
-          name: userInfo.name,
-          picture: userInfo.picture,
-        },
-      }),
-      {
-        status: 200,
+    if (!userInfo.verified_email) {
+      return new Response(JSON.stringify({ error: "Google account not verified" }), {
+        status: 403,
         headers: { "Content-Type": "application/json" },
+      })
+    }
+
+    const response = await handleusersdata(
+      {
+        email: userInfo.email,
+        username: userInfo.email?.split("@")[0],
+        fullName: userInfo.name,
+        firstName: userInfo.given_name,
+        lastName: userInfo.family_name,
+        picture: userInfo.picture,
       },
+      "google",
+      request,
     )
+    if(typeof validate_api_sessions === 'object' && validate_api_sessions.headers) {
+      const headers = new Headers(response.headers);
+      validate_api_sessions.headers.forEach((value: string, key: string) => {
+        if (key.toLowerCase() === "set-cookie") {
+          headers.append("Set-Cookie", value);
+        } else {
+          headers.set(key, value);
+        }
+      });
+      const body = await response.text();
+      return new Response(body, { status: response.status, headers });
+    }
+    return response
   } catch (error) {
     console.error("Google verification failed:", error)
     return new Response(JSON.stringify({ error: "Failed to verify Google login" }), {

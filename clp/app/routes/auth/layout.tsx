@@ -1,15 +1,14 @@
-import { data, Outlet, redirect, useLoaderData, type MetaFunction } from "react-router"
+import { data, Link, Outlet, redirect, useLoaderData, type MetaFunction } from "react-router"
 import AuthHero from "./components/AuthHero"
 import AuthMap from "./components/AuthMap"
 import { AuthProvider } from "./lib/Context"
-import { isAuthenticated } from "~/utils/Security/Password"
 import SetToken from "~/utils/Security/unsharedkeyEncryption/Combined/Verification/SetToken"
 import { useEffect, useRef, useState } from "react"
 import { clientCollectorScript } from "~/utils/Security/client/client-script"
 import { validator } from "~/utils/Validator/validator"
 import { VerifyToken } from "~/utils/Security/unsharedkeyEncryption/Combined/Verification/VerifyToken"
 import { validateSessionToken } from "~/utils/session-token"
-import { cf_setKeys, is_authenticated_keys, is_development } from "~/utils/is_authenticated"
+import { cf_setKeys, is_authenticated_keys, is_development, isAuthenticated } from "~/utils/is_authenticated"
 import { Cookie } from "~/utils/cookie-parser"
 import { quickAuthReplayStore } from "~/utils/Security/quick-auth-replay"
 import { encrypt } from "~/utils/Security/client"
@@ -60,7 +59,7 @@ export const action = async ({request}: {request: Request}) => {
         }, request.headers);
         if(!validate_token || typeof validate_token !== 'object') return data(null, { status: 401 });
 
-        const keys = is_authenticated_keys(is_authenticated);
+        const keys = is_authenticated_keys(typeof is_authenticated === 'object' ? is_authenticated.authenticated : is_authenticated);
 
         let validate_global_id = await validateSessionToken(global_id, request.headers, keys);
         if(!validate_global_id) return data(null, { status: 401 });
@@ -173,7 +172,7 @@ export default function Layout() {
             <div className="md:fixed relative inset-0 flex flex-col md:flex-row bg-background text-foreground">
                 <div className="relative z-10 flex-1 min-h-[60vh] md:min-h-screen flex flex-col justify-between px-6 sm:px-10 md:px-14 py-8 md:py-10 gap-8 overflow-auto">
 
-                    <main className="flex-1 flex flex-col justify-center">
+                    <main className="flex-1 flex flex-col justify-start">
                         <div className="space-y-6">
                             <div className="flex items-center gap-2">
                                 <img
@@ -189,13 +188,13 @@ export default function Layout() {
                             <Outlet />
                             <p className="pt-3 text-[11px] text-muted-foreground leading-relaxed w-full items-center justify-center flex flex-wrap gap-1">
                                 By signing up, you agree to our{" "}
-                                <span className="underline underline-offset-2 decoration-muted-foreground/50">
+                                <Link to="/terms-of-service/auth" className="underline underline-offset-2 decoration-muted-foreground/50 hover:text-primary">
                                     terms of service
-                                </span>{" "}
+                                </Link>{" "}
                                 and{" "}
-                                <span className="underline underline-offset-2 decoration-muted-foreground/50">
+                                <Link to="/privacy-policy/auth" className="underline underline-offset-2 decoration-muted-foreground/50 hover:text-primary">
                                     privacy policy
-                                </span>
+                                </Link>
                                 .
                             </p>
                         </div>

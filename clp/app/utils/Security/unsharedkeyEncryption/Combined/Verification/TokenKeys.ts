@@ -67,6 +67,24 @@ const TOKEN_KEY_CONFIGS: readonly TokenKeyConfig[] = [
         expiresIn: "1h"
     },
     {
+        name: "third_party_key",
+        envKey: "THIRD_PARTY_KEY",
+        algorithm: "HS512",
+        expiresIn: "30m"
+    },
+    {
+        name: "device_login_key",
+        envKey: "DEVICE_LOGIN_KEY",
+        algorithm: "HS512",
+        expiresIn: "100y"
+    },
+    {
+        name: "xs_key",
+        envKey: "XS_KEY",
+        algorithm: "HS512",
+        expiresIn: "100y"
+    },
+    {
         name: "quick_auth",
         envKey: "QUICK_AUTH",
         algorithm: "HS512",

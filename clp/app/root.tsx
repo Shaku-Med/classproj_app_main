@@ -37,7 +37,7 @@ export const links: Route.LinksFunction = () => [
 
 export const loader = async ({request}: {request: Request}) => {
   try {
-    let is_authenticated = await isAuthenticated(request);
+    let is_authenticated = await isAuthenticated(request, true);
     const url = new URL(request.url)
     const pathname = url.pathname.toLowerCase()
     
@@ -69,6 +69,8 @@ export const loader = async ({request}: {request: Request}) => {
       
       return data({ data: null, status: 401});
     }
+    
+    return data({ data: true, status: 200 });
   }
   catch (error) {
     console.error(error)

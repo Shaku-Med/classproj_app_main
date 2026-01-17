@@ -12,20 +12,21 @@ export default [
     ]),
     route(`auth`, 'routes/auth/layout.tsx', [
         index('routes/auth/login-signup/index.tsx'),
-        route('signup', 'routes/auth/login-signup/signup/index.tsx'),
-        route('reset', 'routes/auth/reset/layout.tsx', [
-            index('routes/auth/reset/index.tsx'),
-            route('password', 'routes/auth/reset/password/layout.tsx', [
-                index('routes/auth/reset/password/index.tsx'),
-            ]),
-            route('verify', 'routes/auth/reset/verify/layout.tsx', [
-                index('routes/auth/reset/verify/index.tsx'),
-                route(':token', 'routes/auth/reset/verify/dynamic/layout.tsx', [
-                    index('routes/auth/reset/verify/dynamic/index.tsx'),
-                    route('email', 'routes/auth/reset/verify/dynamic/email/index.tsx'),
-                ]),
-            ]),
-        ]),
+        // route('signup', 'routes/auth/login-signup/signup/index.tsx'),
+        route('thirdparty', 'routes/auth/third_party/index.tsx'),
+        // route('reset', 'routes/auth/reset/layout.tsx', [
+        //     index('routes/auth/reset/index.tsx'),
+        //     route('password', 'routes/auth/reset/password/layout.tsx', [
+        //         index('routes/auth/reset/password/index.tsx'),
+        //     ]),
+        //     route('verify', 'routes/auth/reset/verify/layout.tsx', [
+        //         index('routes/auth/reset/verify/index.tsx'),
+        //         route(':token', 'routes/auth/reset/verify/dynamic/layout.tsx', [
+        //             index('routes/auth/reset/verify/dynamic/index.tsx'),
+        //             route('email', 'routes/auth/reset/verify/dynamic/email/index.tsx'),
+        //         ]),
+        //     ]),
+        // ]),
     ]),
     route('error', 'routes/error-page/index.tsx'),
 ] satisfies RouteConfig;

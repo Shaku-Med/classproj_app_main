@@ -2,6 +2,7 @@ import { DecryptCombine } from "../Combined";
 import { getClientIP } from "./GetIp";
 import { getAllKeys } from "./TokenKeys";
 import { buildKeyNames, extractTokenHeaders } from "./TokenKeys";
+import { log } from '../../../../log'
 
 interface VerifyTokenProps {
     token: string
@@ -37,7 +38,11 @@ export const VerifyToken = async (props: VerifyTokenProps, headers: Headers) => 
         return null;
     }
     catch (error) {
-        console.error('Error found in VerifyToken: -----> \n', error)
+        log({
+            type: 'error',
+            message: 'Error found in VerifyToken',
+            error: error instanceof Error ? error : new Error(String(error)),
+        })
         return null
     }
 }

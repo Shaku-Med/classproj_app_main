@@ -48,8 +48,9 @@ const LoginForm = () => {
   return (
     <div className="space-y-6 w-full">
       <ThirdPartyAuth disabled={isThirdPartyAuth} setIsThirdPartyAuth={setIsThirdPartyAuth} />
-      <Divider />
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {/* For now we are not using the login form. This feature will be added later. */}
+      {/* <Divider /> */}
+      {/* <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="login-email">Email</Label>
           <Input
@@ -111,7 +112,7 @@ const LoginForm = () => {
             Sign up
           </Link>
         </div>
-      </form>
+      </form> */}
     </div>
   )
 }

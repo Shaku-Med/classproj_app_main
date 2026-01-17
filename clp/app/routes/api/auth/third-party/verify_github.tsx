@@ -2,6 +2,7 @@ import { redirect } from "react-router"
 import { EnvValidator } from "~/utils/Database/EnvValidator"
 import { handleRedirect } from "~/utils/handle-redirect"
 import { validateApiSessions } from "~/utils/session-token"
+import { handleusersdata } from "~/routes/api/auth/lib/handleusersdata"
 
 type VerifyGitHubRequestBody = {
   code?: string
@@ -99,14 +100,22 @@ export const action = async ({ request }: { request: Request }) => {
   }
 
   try {
-    let validate_api_sessions: boolean | {success: boolean, redirect_url?: string, response?: {
-      data: any,
-      status: number
-    }} = await validateApiSessions(request);
+    type ValidateApiSessionsResult =
+      | boolean
+      | {
+          success: boolean
+          redirect_url?: string
+          headers?: Headers
+          response?: {
+            data: any
+            status: number
+            headers?: Headers
+          }
+        }
+    let validate_api_sessions: ValidateApiSessionsResult = await validateApiSessions(request);
     if(!validate_api_sessions) return new Response(null, { status: 401 });
-    if(typeof validate_api_sessions === 'object' && !validate_api_sessions.success) return new Response(validate_api_sessions.response?.data, { status: validate_api_sessions.response?.status || 401 });
+    if(typeof validate_api_sessions === 'object' && !validate_api_sessions.success) return new Response(validate_api_sessions.response?.data, { status: validate_api_sessions.response?.status || 401, headers: validate_api_sessions.response?.headers });
     if(typeof validate_api_sessions === 'object' && validate_api_sessions.redirect_url) return redirect(validate_api_sessions.redirect_url, request);
-
 
     const body = (await request.json()) as VerifyGitHubRequestBody
 
@@ -128,26 +137,45 @@ export const action = async ({ request }: { request: Request }) => {
     const userInfo = await fetchGitHubUser(accessToken)
     const emails = await fetchGitHubEmails(accessToken)
 
+    const verifiedEmail =
+      emails.find((email) => email.verified)?.email || userInfo.email
+
+    if (!verifiedEmail) {
+      return new Response(JSON.stringify({ error: "GitHub account not verified" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+
     const primaryEmail =
       emails.find((email) => email.primary && email.verified)?.email ||
       emails.find((email) => email.verified)?.email ||
       emails[0]?.email ||
       userInfo.email
 
-    return new Response(
-      JSON.stringify({
-        user: {
-          id: String(userInfo.id),
-          email: primaryEmail,
-          name: userInfo.name || userInfo.login,
-          picture: userInfo.avatar_url,
-        },
-      }),
+    const response = await handleusersdata(
       {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
+        email: primaryEmail,
+        username: userInfo.login,
+        fullName: userInfo.name || userInfo.login,
+        picture: userInfo.avatar_url,
+      },
+      "github",
+      request,
     )
+    if(typeof validate_api_sessions === 'object' && validate_api_sessions.headers) {
+      const headers = new Headers(response.headers);
+      validate_api_sessions.headers.forEach((value: string, key: string) => {
+        if (key.toLowerCase() === "set-cookie") {
+          headers.append("Set-Cookie", value);
+        } else {
+          headers.set(key, value);
+        }
+      });
+      const body = await response.text();
+      return new Response(body, { status: response.status, headers });
+    }
+    return response
   } catch (error) {
     console.error("GitHub verification failed:", error)
     return new Response(JSON.stringify({ error: "Failed to verify GitHub login" }), {

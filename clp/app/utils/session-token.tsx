@@ -84,9 +84,10 @@ export const validateSessionToken = async (token: string, headers: Headers, keys
 }
 
 
-export const validateApiSessions = async (request: Request): Promise<{success: boolean, redirect_url?: string, response?: {
+export const validateApiSessions = async (request: Request): Promise<{success: boolean, redirect_url?: string, headers?: Headers, response?: {
   data: any,
   status: number
+  headers?: Headers
 }} | boolean> => {
   try {
     let cf = Cookie.get('_cf', request);
@@ -94,9 +95,12 @@ export const validateApiSessions = async (request: Request): Promise<{success: b
     let get_client_ip = await getClientIP(request.headers);
     let cf_access_key = EnvValidator('CSRF_TOKEN');
     // authenticated users cannot access api routes
-    let is_authenticated = await isAuthenticated(request);
+    let auth_result = await isAuthenticated(request, false);
+    let is_authenticated = typeof auth_result === 'object' ? auth_result.authenticated : auth_result;
+    let auth_headers = typeof auth_result === 'object' ? auth_result.headers : undefined;
     if(is_authenticated) return {
       success: false,
+      headers: auth_headers,
       redirect_url: getRedirectUrl('/', request),
     }
 
@@ -147,7 +151,7 @@ export const validateApiSessions = async (request: Request): Promise<{success: b
       }
     }
 
-    return true
+    return auth_headers ? { success: true, headers: auth_headers } : true
   }
   catch (error) {
     console.error(`Error found in validateApiSessions: -----> ${JSON.stringify(error)}`)

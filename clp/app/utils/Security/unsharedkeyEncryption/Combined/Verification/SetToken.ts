@@ -2,8 +2,21 @@ import { EncryptCombine } from '../Combined';
 import { getClientIP } from './GetIp';
 import { getExpirationDate } from './ExpirationTime';
 import { buildKeyNames, getAllKeys } from './TokenKeys';
+import { log } from '../../../../log'
 
-const SetToken = async (headers: Headers, options?: { expiresIn?: string; algorithm?: string }, addKeyNames?: any[], addData?: object, setUA?: boolean) => {
+type TokenOptions = {
+    expiresIn?: string;
+    algorithm?: string;
+    skipExpiration?: boolean;
+}
+
+const getNeverExpireDate = () => {
+    const date = new Date();
+    date.setUTCFullYear(date.getUTCFullYear() + 100);
+    return date;
+}
+
+const SetToken = async (headers: Headers, options?: TokenOptions, addKeyNames?: any[], addData?: object, setUA?: boolean) => {
   try {
         let h = headers as unknown as Headers
         let gip = await getClientIP(h)
@@ -33,16 +46,21 @@ const SetToken = async (headers: Headers, options?: { expiresIn?: string; algori
         const encryptionKeys = await getAllKeys(keyNames);
         if(!encryptionKeys) return null;
 
-        const expirationDate = getExpirationDate(options?.expiresIn)
+        const expirationDate = options?.skipExpiration
+            ? getNeverExpireDate()
+            : getExpirationDate(options?.expiresIn)
         obj = {
             ...obj,
             expiresAt: expirationDate.toISOString()
         }
 
-        let enc2 = await EncryptCombine(obj, encryptionKeys, options || {
-            expiresIn: '6m',
-            algorithm: 'HS512'
-        })
+        const jwtOptions = options?.skipExpiration
+            ? { algorithm: options?.algorithm || 'HS512' }
+            : options || {
+                expiresIn: '6m',
+                algorithm: 'HS512'
+            }
+        let enc2 = await EncryptCombine(obj, encryptionKeys, jwtOptions)
         if(!enc2) return null;
         return {
             data: enc2,
@@ -50,7 +68,11 @@ const SetToken = async (headers: Headers, options?: { expiresIn?: string; algori
         }
   }
   catch (e) {
-    console.error("Error Found in SetToken: ", e)
+    log({
+        type: 'error',
+        message: 'Error Found in SetToken',
+        error: e instanceof Error ? e : new Error(String(e)),
+    })
     return null
   }
 }
