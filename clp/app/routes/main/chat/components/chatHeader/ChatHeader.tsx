@@ -7,9 +7,10 @@ type ChatHeaderProps = {
   title: string
   subtitle?: string
   backHref?: string
+  onAvatarClick?: () => void
 }
 
-export function ChatHeader({ title, subtitle, backHref }: ChatHeaderProps) {
+export function ChatHeader({ title, subtitle, backHref, onAvatarClick }: ChatHeaderProps) {
   const initials = title
     .split(" ")
     .filter(Boolean)
@@ -28,20 +29,25 @@ export function ChatHeader({ title, subtitle, backHref }: ChatHeaderProps) {
           </Button>
         ) : null}
 
-        <div className="flex size-9 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
-          {initials || "?"}
-        </div>
-
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-foreground">
-            {title}
+        <button
+          onClick={onAvatarClick}
+          className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
+        >
+          <div className="flex size-9 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
+            {initials || "?"}
           </div>
-          {subtitle ? (
-            <div className="truncate text-xs text-muted-foreground">
-              {subtitle}
+
+          <div className="min-w-0 text-left">
+            <div className="truncate text-sm font-semibold text-foreground">
+              {title}
             </div>
-          ) : null}
-        </div>
+            {subtitle ? (
+              <div className="truncate text-xs text-muted-foreground">
+                {subtitle}
+              </div>
+            ) : null}
+          </div>
+        </button>
       </div>
 
       <div className="flex items-center gap-1">
