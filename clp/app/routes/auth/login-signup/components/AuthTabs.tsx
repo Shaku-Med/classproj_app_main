@@ -8,9 +8,9 @@ const AuthTabs = () => {
   return (
     <div className="w-full">
       {activeTab === "login" ? (
-        <LoginForm onSwitchToSignup={() => setActiveTab("signup")} />
+        <LoginForm />
       ) : (
-        <SignupForm onSwitchToLogin={() => setActiveTab("login")} />
+        <SignupForm />
       )}
     </div>
   )

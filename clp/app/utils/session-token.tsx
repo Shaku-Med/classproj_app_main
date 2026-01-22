@@ -23,7 +23,7 @@ const makeSessionToken = async (props: SessionTokenProps, keys: string[]): Promi
     let token = await SetToken(props.request.headers, {
         expiresIn: '1h',
         algorithm: 'HS512'
-      }, keys as string[])
+    }, keys as string[])
     if(!token) return null;
     return token;
   }

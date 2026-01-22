@@ -2,6 +2,7 @@ import GoogleButton from "./GoogleButton"
 import GitHubButton from "./GitHubButton"
 import { useAuth } from "../../../lib/Context"
 import { Loader2 } from "lucide-react"
+import { useEffect } from "react"
 interface ThirdPartyAuthProps {
   disabled?: boolean
   setIsThirdPartyAuth?: (value: boolean) => void

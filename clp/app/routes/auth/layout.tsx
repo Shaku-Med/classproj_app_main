@@ -3,7 +3,7 @@ import AuthHero from "./components/AuthHero"
 import AuthMap from "./components/AuthMap"
 import { AuthProvider } from "./lib/Context"
 import SetToken from "~/utils/Security/unsharedkeyEncryption/Combined/Verification/SetToken"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { clientCollectorScript } from "~/utils/Security/client/client-script"
 import { validator } from "~/utils/Validator/validator"
 import { VerifyToken } from "~/utils/Security/unsharedkeyEncryption/Combined/Verification/VerifyToken"
@@ -116,7 +116,7 @@ export default function Layout() {
     const data = useLoaderData<typeof loader>();
     const [active, setActive] = useState(false);
     
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (typeof window !== 'undefined' && !(window as any).DeviceSecurity) {
             const script = document.createElement('script');
             script.textContent = clientCollectorScript;
@@ -138,10 +138,11 @@ export default function Layout() {
                     attempts++;
                 }
 
+                
                 let getDev_id: string | null = null;
                 if (typeof window !== 'undefined' && (window as any).DeviceSecurity) {
                     getDev_id = await (window as any).DeviceSecurity.getDeviceId();
-                }
+                }                
 
                 let response = await fetch('/auth', {
                     method: 'POST',

@@ -15,8 +15,6 @@ import '../app/styles/head.css';
 import '../app/styles/default.css';
 import { allowedRoutes } from "./utils/allowed-routes";
 import { handleRedirect } from "./utils/handle-redirect";
-import { useEffect } from "react";
-import SetToken from "./utils/Security/unsharedkeyEncryption/Combined/Verification/SetToken";
 import { handleSessionToken } from "./utils/session-token";
 import { Cookie } from "./utils/cookie-parser";
 import ErrorPage from "./routes/error-page";

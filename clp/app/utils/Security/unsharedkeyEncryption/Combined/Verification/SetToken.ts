@@ -3,6 +3,7 @@ import { getClientIP } from './GetIp';
 import { getExpirationDate } from './ExpirationTime';
 import { buildKeyNames, getAllKeys } from './TokenKeys';
 import { log } from '../../../../log'
+import { is_development } from '~/utils/is_authenticated';
 
 type TokenOptions = {
     expiresIn?: string;
@@ -23,7 +24,7 @@ const SetToken = async (headers: Headers, options?: TokenOptions, addKeyNames?: 
         //
         if(!gip) return null;
         let o = {
-            'sec-ch-ua-platform': h.get('sec-ch-ua-platform'),
+            'sec-ch-ua-platform': h.get('sec-ch-ua-platform') || is_development() ? "mobile" : null,
             'user-agent': h.get('user-agent')?.split(/\s+/)?.join(''),
             'x-forwarded-for': gip
         }

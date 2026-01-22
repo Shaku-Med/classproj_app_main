@@ -1,3 +1,4 @@
+import { is_development } from "~/utils/is_authenticated";
 import { EnvValidator } from "./EnvValidator";
 import { getClientIP } from "./GetIp";
 
@@ -170,7 +171,7 @@ const DEFAULT_KEY_NAMES = ['authorization_key'] as const;
 export const extractTokenHeaders = async (headers: Headers): Promise<TokenHeaders> => {
     let ip = await getClientIP(headers)
     return {
-        'sec-ch-ua-platform': headers.get('sec-ch-ua-platform'),
+        'sec-ch-ua-platform': headers.get('sec-ch-ua-platform') || is_development() ? "mobile" : null,
         'user-agent': headers.get('user-agent')?.replace(/\s+/g, '') || null,
         'x-forwarded-for': ip as string || null
     };

@@ -1,9 +1,11 @@
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
 export default [
-    route(`*`, 'routes/home/layout.tsx', [
-        index('routes/home/index.tsx'),
-        route('*', 'routes/home/not-found.tsx'),
+    route(`*`, 'routes/main/layout.tsx', [
+        index('routes/main/index.tsx'),
+        route('chat/:chatId', 'routes/main/chat/$chatId.tsx'),
+        route('profile', 'routes/main/profile/index.tsx'),
+        route('*', 'routes/main/not-found.tsx'), 
     ]),
     route('api', 'routes/api/layout.tsx', [
         route('', 'routes/api/index.tsx'),

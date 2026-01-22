@@ -31,6 +31,7 @@ export const VerifyToken = async (props: VerifyTokenProps, headers: Headers) => 
         if(decryptedToken?.expiresAt && new Date(decryptedToken?.expiresAt) > new Date()) {
             const tokenHeaders = await extractTokenHeaders(h);
             // console.log('tokenHeaders', tokenHeaders);
+            // console.log('decryptedToken', decryptedToken);
             if(tokenHeaders?.['user-agent'] !== decryptedToken?.['user-agent'] || tokenHeaders?.['x-forwarded-for'] !== decryptedToken?.['x-forwarded-for'] || tokenHeaders?.['sec-ch-ua-platform'] !== decryptedToken?.['sec-ch-ua-platform']) return null;
             return decryptedToken;
         };

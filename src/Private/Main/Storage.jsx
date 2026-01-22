@@ -16,7 +16,6 @@ let Storage = () => {
 
 
     const { scp, setscp, store, k, owner, setstore } = useContext(Conn);
-    console.log(store)
     const [drag, setdrag] = useState(false)
     const [rl, setrl] = useState(0)
     const [srl, setsrl] = useState(0)
@@ -348,7 +347,6 @@ let Storage = () => {
 
                 let c = store
                 let f = c.findIndex(v => v.id === id)
-                console.log(f)
                 if (f !== -1) {
                     c.splice(f, 1)
                     setstore(c)
